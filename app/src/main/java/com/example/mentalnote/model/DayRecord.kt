@@ -18,9 +18,9 @@ import kotlinx.serialization.Contextual
 
 @Serializable
 data class DayRecord(
-    val date: String,
-    val emoji: String,
-    val summary: String,
+    val date: String, //yyyy-mm-dd
+    val emoji: String = "",
+    val summary: String = "",
     val detail: String = "",
     @Contextual val imageUri: Uri? = null,
     val imageBitmap: ImageBitmap? = null

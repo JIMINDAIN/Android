@@ -52,7 +52,7 @@ fun MainScreen() {
                     dayRecords = dayRecords,
                     onSave = { record ->
                         dayRecords = dayRecords.toMutableList().also { list ->
-                            val idx = list.indexOfFirst { it.day == record.day }
+                            val idx = list.indexOfFirst { it.date == record.date }
                             if (idx >= 0) list[idx] = record else list.add(record)
                         }
                     }
