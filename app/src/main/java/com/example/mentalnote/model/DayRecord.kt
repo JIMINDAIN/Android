@@ -18,7 +18,7 @@ import kotlinx.serialization.Contextual
 
 @Serializable
 data class DayRecord(
-    val date: String,
+    val dateee: String,
     val emoji: String,
     val summary: String,
     val detail: String = "",
