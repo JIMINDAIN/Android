@@ -124,7 +124,7 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
                     emoji = emoji,
                     summary = summary,
                     detail = detail,
-                    imageUri = imageUri,
+                    imageUriString = imageUri?.toString(),
                     imageBitmap = imageBitmap
                 )
                 weekRecords = weekRecords.toMutableList().also { list ->
