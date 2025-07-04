@@ -1,7 +1,9 @@
 package com.example.mentalnote.model
 
+import kotlinx.serialization.Serializable
 import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
+import kotlinx.serialization.Contextual
 
 /**
  * 요일별 기록을 나타내는 데이터 클래스
@@ -13,11 +15,13 @@ import androidx.compose.ui.graphics.ImageBitmap
  * @property imageUri 갤러리에서 선택한 이미지의 URI (nullable)
  * @property imageBitmap 카메라로 촬영한 이미지의 Bitmap (nullable)
  */
+
+@Serializable
 data class DayRecord(
     val day: String,
     val emoji: String,
     val summary: String,
     val detail: String = "",
-    val imageUri: Uri? = null,
+    @Contextual val imageUri: Uri? = null,
     val imageBitmap: ImageBitmap? = null
 )
