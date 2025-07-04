@@ -1,4 +1,5 @@
 package com.example.mentalnote.ui
+
 import com.example.mentalnote.dataStore
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -36,9 +37,8 @@ import androidx.datastore.preferences.core.edit
 import java.time.LocalDate
 import java.time.DayOfWeek
 
-
-
 val DAY_RECORDS_KEY = stringPreferencesKey("day_records")
+val LAST_RESET_DATE_KEY = stringPreferencesKey("last_reset_date")
 
 suspend fun saveDayRecords(context: Context, records: List<DayRecord>) {
     val json = Json.encodeToString(records)
@@ -49,47 +49,49 @@ suspend fun saveDayRecords(context: Context, records: List<DayRecord>) {
 
 suspend fun loadDayRecords(context: Context): List<DayRecord> {
     val prefs = context.dataStore.data.first()
-    val json = prefs[DAY_RECORDS_KEY] ?: return listOf("월", "화", "수", "목", "금", "토", "일").map {
-        DayRecord(it, emoji = "😃", summary = "", detail = "")
-    }
-    return try {
-        Json.decodeFromString(json)
-    } catch (e: Exception) {
+    val json = prefs[DAY_RECORDS_KEY]
+    return if (json == null) {
         emptyList()
+    } else {
+        try {
+            Json.decodeFromString(json)
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }
 
-
 @Composable
 fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
-    val days = listOf("월", "화", "수", "목", "금", "토", "일")
-    var selectedDay by remember { mutableStateOf<String?>(null) }
+    val today = LocalDate.now()
+    val monday = today.with(DayOfWeek.MONDAY)
+    val weekDates = (0..6).map { monday.plusDays(it.toLong()) }
+    val weekDateStrings = weekDates.map { it.toString() }
+
+    var selectedDate by remember { mutableStateOf<String?>(null) }
     val scrollState = rememberScrollState()
 
-    // 초기화 관련 추가
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var weekRecords by remember { mutableStateOf(dayRecords) }
 
     LaunchedEffect(Unit) {
         val prefs = context.dataStore.data.first()
-        val lastResetDateStr = prefs[stringPreferencesKey("last_reset_date")]
-        val today = LocalDate.now()
-        val mondayOfThisWeek = today.with(DayOfWeek.MONDAY)
+        val lastResetDateStr = prefs[LAST_RESET_DATE_KEY]
         val lastResetDate = lastResetDateStr?.let { LocalDate.parse(it) }
 
-        if (today.dayOfWeek == DayOfWeek.MONDAY && lastResetDate != mondayOfThisWeek) {
-            // 월요일이고, 이번 주에 아직 초기화 안했으면 초기화
-            val newRecords = days.map { day ->
-                DayRecord(day, emoji = "😃", summary = "", detail = "")
+        if (today.dayOfWeek == DayOfWeek.MONDAY && lastResetDate != monday) {
+            // 월요일이고 이번 주에 초기화 안 했다면 초기화
+            val newRecords = weekDateStrings.map { dateStr ->
+                DayRecord(date = dateStr)
             }
             weekRecords = newRecords
 
             coroutineScope.launch {
                 context.dataStore.edit { prefs ->
-                    prefs[stringPreferencesKey("last_reset_date")] = mondayOfThisWeek.toString()
+                    prefs[LAST_RESET_DATE_KEY] = monday.toString()
                 }
-                saveDayRecords(context, newRecords) // 필요 시 영구저장
+                saveDayRecords(context, newRecords)
             }
         } else {
             // 기존 데이터 불러오기
@@ -103,40 +105,57 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
-        days.forEach { day ->
-            val record = weekRecords.find { it.day == day }
-            WeekRow(day = day, record = record, onClick = { selectedDay = day })
+        weekDateStrings.forEach { dateStr ->
+            val record = weekRecords.find { it.date == dateStr }
+            WeekRow(date = dateStr, record = record, onClick = { selectedDate = dateStr })
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
 
-    if (selectedDay != null) {
-        val record = weekRecords.find { it.day == selectedDay }
+    if (selectedDate != null) {
+        val record = weekRecords.find { it.date == selectedDate }
         DayDetailDialog(
-            day = selectedDay!!,
+            date = selectedDate!!,
             initialRecord = record,
-            onDismiss = { selectedDay = null },
+            onDismiss = { selectedDate = null },
             onSave = { emoji, summary, detail, imageUri, imageBitmap ->
-                val newRecord = DayRecord(selectedDay!!, emoji, summary, detail, imageUri, imageBitmap)
+                val newRecord = DayRecord(
+                    date = selectedDate!!,
+                    emoji = emoji,
+                    summary = summary,
+                    detail = detail,
+                    imageUri = imageUri,
+                    imageBitmap = imageBitmap
+                )
                 weekRecords = weekRecords.toMutableList().also { list ->
-                    val idx = list.indexOfFirst { it.day == selectedDay }
+                    val idx = list.indexOfFirst { it.date == selectedDate }
                     if (idx >= 0) list[idx] = newRecord else list.add(newRecord)
                 }
                 onSave(newRecord)
                 coroutineScope.launch {
                     saveDayRecords(context, weekRecords)
                 }
-                selectedDay = null
+                selectedDate = null
             }
         )
     }
 }
 
-
-
-
 @Composable
-fun WeekRow(day: String, record: DayRecord?, onClick: () -> Unit) {
+fun WeekRow(date: String, record: DayRecord?, onClick: () -> Unit) {
+    val localDate = LocalDate.parse(date)
+    val dayOfWeekKorean = when (localDate.dayOfWeek) {
+        DayOfWeek.MONDAY -> "월"
+        DayOfWeek.TUESDAY -> "화"
+        DayOfWeek.WEDNESDAY -> "수"
+        DayOfWeek.THURSDAY -> "목"
+        DayOfWeek.FRIDAY -> "금"
+        DayOfWeek.SATURDAY -> "토"
+        DayOfWeek.SUNDAY -> "일"
+    }
+
+    val isEmptyRecord = record == null || record.summary.isEmpty()
+
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -147,42 +166,38 @@ fun WeekRow(day: String, record: DayRecord?, onClick: () -> Unit) {
             .padding(vertical = 8.dp, horizontal = 8.dp)
             .clickable { onClick() }
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (record == null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "${day}요일",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }   else {
+        if (isEmptyRecord) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
-                    text = record?.emoji ?: "😃",
+                    text = "${dayOfWeekKorean}요일",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp, horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = record.emoji,
                     style = MaterialTheme.typography.headlineMedium.copy(fontSize = 40.sp),
-                    modifier = Modifier
-                        .padding(end = 16.dp)
-                        .align(Alignment.CenterVertically)
+                    modifier = Modifier.padding(end = 16.dp)
                 )
                 Column {
                     Text(
-                        text = "${day}요일",
+                        text = "${dayOfWeekKorean}요일",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp),
                         modifier = Modifier.padding(top = 6.dp)
                     )
                     Text(
-                        text = record?.summary ?: "",
+                        text = record.summary,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.DarkGray
                     )
@@ -192,10 +207,9 @@ fun WeekRow(day: String, record: DayRecord?, onClick: () -> Unit) {
     }
 }
 
-
 @Composable
 fun DayDetailDialog(
-    day: String,
+    date: String,
     initialRecord: DayRecord?,
     onDismiss: () -> Unit,
     onSave: (String, String, String, Uri?, androidx.compose.ui.graphics.ImageBitmap?) -> Unit
@@ -226,7 +240,19 @@ fun DayDetailDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "${day}요일 기록") },
+        title = {
+            val localDate = LocalDate.parse(date)
+            val dayOfWeekKorean = when (localDate.dayOfWeek) {
+                DayOfWeek.MONDAY -> "월"
+                DayOfWeek.TUESDAY -> "화"
+                DayOfWeek.WEDNESDAY -> "수"
+                DayOfWeek.THURSDAY -> "목"
+                DayOfWeek.FRIDAY -> "금"
+                DayOfWeek.SATURDAY -> "토"
+                DayOfWeek.SUNDAY -> "일"
+            }
+            Text(text = "${dayOfWeekKorean}요일 기록")
+        },
         text = {
             Column {
                 TextField(
@@ -244,9 +270,7 @@ fun DayDetailDialog(
                     value = detail,
                     onValueChange = { detail = it },
                     placeholder = { Text("상세 기록을 입력하세요") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp),
+                    modifier = Modifier.fillMaxWidth().height(120.dp),
                     maxLines = 10
                 )
                 Spacer(modifier = Modifier.height(8.dp))
