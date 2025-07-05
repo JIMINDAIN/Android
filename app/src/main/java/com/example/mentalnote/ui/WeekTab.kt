@@ -126,6 +126,7 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
             .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(scrollState)
+//            .background(Color(0xffe3ffea))
     ) {
         weekDateStrings.forEach { dateStr ->
             val record = weekRecords.find { it.date == dateStr }
