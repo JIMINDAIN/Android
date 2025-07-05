@@ -3,7 +3,6 @@ package com.example.mentalnote.model
 import kotlinx.serialization.Serializable
 import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Transient
 
 /**

@@ -1,10 +1,16 @@
 package com.example.mentalnote.ui
 
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.graphics.graphicsLayer
+import com.example.mentalnote.R
 import com.google.accompanist.permissions.*
 import android.content.Context
 import android.Manifest
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import android.util.Log
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -65,6 +71,7 @@ suspend fun loadDayRecords(context: Context): List<DayRecord> {
     }
 }
 
+//WeekTab을 구현하는 메인함수
 @Composable
 fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
     val today = LocalDate.now()
@@ -78,25 +85,42 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     var weekRecords by remember { mutableStateOf(dayRecords) }
 
+    //매주 월요일마다 초기화
+    //기존 데이터는 그대로 유지되고 WeekRecord 변수만 초기화
     LaunchedEffect(Unit) {
         val prefs = context.dataStore.data.first()
         val lastResetDateStr = prefs[LAST_RESET_DATE_KEY]
         val lastResetDate = lastResetDateStr?.let { LocalDate.parse(it) }
 
+        val existingRecords = loadDayRecords(context).toMutableList()
+
         if (today.dayOfWeek == DayOfWeek.MONDAY && lastResetDate != monday) {
-            val newRecords = weekDateStrings.map { DayRecord(date = it) }
-            weekRecords = newRecords
+            // 이번 주 날짜만 새로운 빈 DayRecord로 교체
+            // 만약 오늘이 월요일이고, 저장된 마지막 초기화 날짜(lastResetDate)가 이번 주 월요일과 다르면
+            // (= 월요일인데 초기화가 안된 경우)
+            weekDateStrings.forEach { dateStr ->
+                val idx = existingRecords.indexOfFirst { it.date == dateStr }
+                if (idx != -1) {
+                    existingRecords[idx] = DayRecord(date = dateStr)
+                } else {
+                    existingRecords.add(DayRecord(date = dateStr))
+                }
+            }
+
+            weekRecords = existingRecords.filter { it.date in weekDateStrings }
             coroutineScope.launch {
                 context.dataStore.edit { prefs ->
                     prefs[LAST_RESET_DATE_KEY] = monday.toString()
                 }
-                saveDayRecords(context, newRecords)
+                saveDayRecords(context, existingRecords)
             }
         } else {
-            weekRecords = loadDayRecords(context)
+            weekRecords = existingRecords.filter { it.date in weekDateStrings }
         }
     }
 
+    //Column 안에서 7일치 날짜별로 WeekRow 컴포저블을 호출하여 날짜와 기록(있으면 요약 및 이모지)을 보여준다
+    //각 WeekRow 클릭 시 해당 날짜(selectedDate)가 선택되어 상세 기록 작성 다이얼로그가 뜬다
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -105,13 +129,19 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
     ) {
         weekDateStrings.forEach { dateStr ->
             val record = weekRecords.find { it.date == dateStr }
-            WeekRow(date = dateStr, record = record, onClick = { selectedDate = dateStr })
+            WeekRow(date = dateStr, record = record, onEmojiClick = { selectedEmoji ->
+                // 클릭 시 DayDetailDialog 열기
+                selectedDate = dateStr
+                // 나중에 selectedEmoji 값도 Dialog에 넘길 수 있음
+            })
+
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
 
     if (selectedDate != null) {
         val record = weekRecords.find { it.date == selectedDate }
+        //DayDetailDialog 함수를 활용해 날마다 상세 정보를 입력한다
         DayDetailDialog(
             date = selectedDate!!,
             initialRecord = record,
@@ -138,46 +168,101 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
 }
 
 @Composable
-fun WeekRow(date: String, record: DayRecord?, onClick: () -> Unit) {
-    val localDate = LocalDate.parse(date)
-    val dayOfWeekKorean = when (localDate.dayOfWeek) {
-        DayOfWeek.MONDAY -> "월"
-        DayOfWeek.TUESDAY -> "화"
-        DayOfWeek.WEDNESDAY -> "수"
-        DayOfWeek.THURSDAY -> "목"
-        DayOfWeek.FRIDAY -> "금"
-        DayOfWeek.SATURDAY -> "토"
-        DayOfWeek.SUNDAY -> "일"
+fun dayOfWeekToDrawableRes(dayOfWeek: DayOfWeek): Int {
+    return when(dayOfWeek) {
+        DayOfWeek.MONDAY -> R.drawable.monday
+        DayOfWeek.TUESDAY -> R.drawable.tuesday
+        DayOfWeek.WEDNESDAY -> R.drawable.wednesday
+        DayOfWeek.THURSDAY -> R.drawable.thursday
+        DayOfWeek.FRIDAY -> R.drawable.friday
+        DayOfWeek.SATURDAY -> R.drawable.saturday
+        DayOfWeek.SUNDAY -> R.drawable.sunday
     }
-    val isEmptyRecord = record == null || record.summary.isEmpty()
-    Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+}
+@Composable
+fun WeekRow(
+    date: String,
+    record: DayRecord?,
+    onEmojiClick: (emoji: String) -> Unit
+) {
+    val localDate = LocalDate.parse(date)
+    val dayofWeek = localDate.dayOfWeek
+    val backgroundColor = when (dayofWeek) {
+        DayOfWeek.MONDAY -> Color(0xffffe3e3)
+        DayOfWeek.TUESDAY -> Color(0xffffe7cb)
+        DayOfWeek.WEDNESDAY -> Color(0xfffffecb)
+        DayOfWeek.THURSDAY -> Color(0xffe1ffcb)
+        DayOfWeek.FRIDAY -> Color(0xffcbfffc)
+        DayOfWeek.SATURDAY -> Color(0xffffe1e1)
+        DayOfWeek.SUNDAY -> Color(0xfffce1ff)
+    }
+
+    val dayImageRes = when (localDate.dayOfWeek) {
+        DayOfWeek.MONDAY -> R.drawable.monday
+        DayOfWeek.TUESDAY -> R.drawable.tuesday
+        DayOfWeek.WEDNESDAY -> R.drawable.wednesday
+        DayOfWeek.THURSDAY -> R.drawable.thursday
+        DayOfWeek.FRIDAY -> R.drawable.friday
+        DayOfWeek.SATURDAY -> R.drawable.saturday
+        DayOfWeek.SUNDAY -> R.drawable.sunday
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
             .padding(8.dp)
-            .clickable { onClick() }
     ) {
-        if (isEmptyRecord) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("${dayOfWeekKorean}요일", fontWeight = FontWeight.Bold)
-            }
-        } else {
+        Image(
+            painter = painterResource(id = dayImageRes),
+            contentDescription = null,
+            modifier = Modifier
+                .size(80.dp)
+                .graphicsLayer { rotationZ = -15f }
+                .offset(x = -8.dp, y = -35.dp)
+                .align(Alignment.TopStart)
+                .zIndex(1f)
+        )
+
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = backgroundColor),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .align(Alignment.Center)
+        ) {
             Row(
-                Modifier.fillMaxWidth().padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+                    .background(Color.Transparent),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly // 대칭 배치
             ) {
-                Text(record?.emoji ?: "", fontSize = 40.sp, modifier = Modifier.padding(end = 16.dp))
-                Column {
-                    Text("${dayOfWeekKorean}요일", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Text(record?.summary ?: "", color = Color.DarkGray)
+                val emojis = listOf(
+                    R.drawable.emoji_happy to "happy",
+                    R.drawable.emoji_bored to "bored",
+                    R.drawable.emoji_blue to "blue",
+                    R.drawable.emoji_upset to "upset"
+                )
+
+                emojis.forEach { (resId, emojiName) ->
+                    Image(
+                        painter = painterResource(id = resId),
+                        contentDescription = emojiName,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clickable { onEmojiClick(emojiName) }
+                    )
                 }
             }
         }
     }
 }
+
+
+
 
 @Composable
 fun DayDetailDialog(
@@ -191,7 +276,7 @@ fun DayDetailDialog(
 
     var summary by remember { mutableStateOf(initialRecord?.summary ?: "") }
     var detail by remember { mutableStateOf(initialRecord?.detail ?: "") }
-    var selectedEmoji by remember { mutableStateOf(initialRecord?.emoji ?: "😃") }
+    var selectedEmoji by remember { mutableStateOf(initialRecord?.emoji ?: "") }
     var imageUri by remember { mutableStateOf<Uri?>(initialRecord?.imageUri) }
     var cameraBitmap by remember { mutableStateOf(initialRecord?.imageBitmap) }
     val photoUri = remember { mutableStateOf<Uri?>(null) }
@@ -250,7 +335,7 @@ fun DayDetailDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("기록 작성") },
+        title = { Text("오늘은 어떤 일이 있었나요?") },
         text = {
             Column {
                 // 1. 한 줄 요약 입력
