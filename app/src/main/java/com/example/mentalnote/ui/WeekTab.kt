@@ -1,21 +1,22 @@
 package com.example.mentalnote.ui
 
-import com.example.mentalnote.dataStore
+import com.google.accompanist.permissions.*
 import android.content.Context
+import android.Manifest
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -25,17 +26,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.Alignment
+import com.example.mentalnote.dataStore
 import com.example.mentalnote.model.DayRecord
-import androidx.compose.foundation.verticalScroll
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.edit
-import java.time.LocalDate
+import java.io.File
 import java.time.DayOfWeek
+import java.time.LocalDate
+import androidx.core.content.FileProvider
+import coil.compose.rememberAsyncImagePainter
+
 
 val DAY_RECORDS_KEY = stringPreferencesKey("day_records")
 val LAST_RESET_DATE_KEY = stringPreferencesKey("last_reset_date")
@@ -70,7 +74,6 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
 
     var selectedDate by remember { mutableStateOf<String?>(null) }
     val scrollState = rememberScrollState()
-
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var weekRecords by remember { mutableStateOf(dayRecords) }
@@ -81,12 +84,8 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
         val lastResetDate = lastResetDateStr?.let { LocalDate.parse(it) }
 
         if (today.dayOfWeek == DayOfWeek.MONDAY && lastResetDate != monday) {
-            // 월요일이고 이번 주에 초기화 안 했다면 초기화
-            val newRecords = weekDateStrings.map { dateStr ->
-                DayRecord(date = dateStr)
-            }
+            val newRecords = weekDateStrings.map { DayRecord(date = it) }
             weekRecords = newRecords
-
             coroutineScope.launch {
                 context.dataStore.edit { prefs ->
                     prefs[LAST_RESET_DATE_KEY] = monday.toString()
@@ -94,7 +93,6 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
                 saveDayRecords(context, newRecords)
             }
         } else {
-            // 기존 데이터 불러오기
             weekRecords = loadDayRecords(context)
         }
     }
@@ -132,9 +130,7 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
                     if (idx >= 0) list[idx] = newRecord else list.add(newRecord)
                 }
                 onSave(newRecord)
-                coroutineScope.launch {
-                    saveDayRecords(context, weekRecords)
-                }
+                coroutineScope.launch { saveDayRecords(context, weekRecords) }
                 selectedDate = null
             }
         )
@@ -153,9 +149,7 @@ fun WeekRow(date: String, record: DayRecord?, onClick: () -> Unit) {
         DayOfWeek.SATURDAY -> "토"
         DayOfWeek.SUNDAY -> "일"
     }
-
     val isEmptyRecord = record == null || record.summary.isEmpty()
-
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -163,44 +157,22 @@ fun WeekRow(date: String, record: DayRecord?, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
-            .padding(vertical = 8.dp, horizontal = 8.dp)
+            .padding(8.dp)
             .clickable { onClick() }
     ) {
         if (isEmptyRecord) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "${dayOfWeekKorean}요일",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("${dayOfWeekKorean}요일", fontWeight = FontWeight.Bold)
             }
         } else {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp, horizontal = 12.dp),
+                Modifier.fillMaxWidth().padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = record.emoji,
-                    style = MaterialTheme.typography.headlineMedium.copy(fontSize = 40.sp),
-                    modifier = Modifier.padding(end = 16.dp)
-                )
+                Text(record?.emoji ?: "", fontSize = 40.sp, modifier = Modifier.padding(end = 16.dp))
                 Column {
-                    Text(
-                        text = "${dayOfWeekKorean}요일",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp),
-                        modifier = Modifier.padding(top = 6.dp)
-                    )
-                    Text(
-                        text = record.summary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.DarkGray
-                    )
+                    Text("${dayOfWeekKorean}요일", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text(record?.summary ?: "", color = Color.DarkGray)
                 }
             }
         }
@@ -214,6 +186,7 @@ fun DayDetailDialog(
     onDismiss: () -> Unit,
     onSave: (String, String, String, Uri?, androidx.compose.ui.graphics.ImageBitmap?) -> Unit
 ) {
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     var summary by remember { mutableStateOf(initialRecord?.summary ?: "") }
@@ -221,44 +194,70 @@ fun DayDetailDialog(
     var selectedEmoji by remember { mutableStateOf(initialRecord?.emoji ?: "😃") }
     var imageUri by remember { mutableStateOf<Uri?>(initialRecord?.imageUri) }
     var cameraBitmap by remember { mutableStateOf(initialRecord?.imageBitmap) }
+    val photoUri = remember { mutableStateOf<Uri?>(null) }
 
-    val context = LocalContext.current
+    // 권한 상태 체크
+    var hasCameraPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                    PackageManager.PERMISSION_GRANTED
+        )
+    }
 
-    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+    // 권한 요청 런처
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        hasCameraPermission = granted
+    }
+
+    // 사진 촬영 런처
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && photoUri.value != null) {
+            imageUri = photoUri.value
+            cameraBitmap = null
+        }
+    }
+
+    // 갤러리 선택 런처 (기존 유지)
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
         if (uri != null) {
             imageUri = uri
             cameraBitmap = null
         }
     }
 
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        if (bitmap != null) {
-            cameraBitmap = bitmap.asImageBitmap()
-            imageUri = null
+    fun launchCamera() {
+        if (hasCameraPermission) {
+            // 권한 있으면 촬영 실행
+            val file = File(context.cacheDir, "captured_${System.currentTimeMillis()}.jpg")
+            val uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                file
+            )
+            photoUri.value = uri
+            cameraLauncher.launch(uri)
+        } else {
+            // 권한 없으면 요청
+            permissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = {
-            val localDate = LocalDate.parse(date)
-            val dayOfWeekKorean = when (localDate.dayOfWeek) {
-                DayOfWeek.MONDAY -> "월"
-                DayOfWeek.TUESDAY -> "화"
-                DayOfWeek.WEDNESDAY -> "수"
-                DayOfWeek.THURSDAY -> "목"
-                DayOfWeek.FRIDAY -> "금"
-                DayOfWeek.SATURDAY -> "토"
-                DayOfWeek.SUNDAY -> "일"
-            }
-            Text(text = "${dayOfWeekKorean}요일 기록")
-        },
+        title = { Text("기록 작성") },
         text = {
             Column {
+                // 1. 한 줄 요약 입력
                 TextField(
                     value = summary,
                     onValueChange = { summary = it },
-                    placeholder = { Text("한 줄 요약을 입력하세요") },
+                    placeholder = { Text("한 줄 요약") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
@@ -266,16 +265,20 @@ fun DayDetailDialog(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // 2. 상세 기록 입력
                 TextField(
                     value = detail,
                     onValueChange = { detail = it },
-                    placeholder = { Text("상세 기록을 입력하세요") },
-                    modifier = Modifier.fillMaxWidth().height(120.dp),
+                    placeholder = { Text("상세 기록") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp),
                     maxLines = 10
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(text = "오늘의 기분 선택:", style = MaterialTheme.typography.bodyMedium)
+                // 3. 이모지 선택
+                Text(text = "오늘의 기분 선택:")
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -298,6 +301,8 @@ fun DayDetailDialog(
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
+
+                // 사진 선택 & 촬영 버튼
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -305,35 +310,24 @@ fun DayDetailDialog(
                     Button(onClick = { galleryLauncher.launch("image/*") }) {
                         Text("사진 선택")
                     }
-                    Button(onClick = { cameraLauncher.launch(null) }) {
+                    Button(onClick = { launchCamera() }) {
                         Text("사진 촬영")
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                if (cameraBitmap != null) {
+
+                // 사진 미리보기
+                imageUri?.let {
+                    val painter = rememberAsyncImagePainter(model = it)
                     Image(
-                        bitmap = cameraBitmap!!,
+                        painter = painter,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
                             .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
                     )
-                } else if (imageUri != null) {
-                    val inputStream = context.contentResolver.openInputStream(imageUri!!)
-                    val bitmap = BitmapFactory.decodeStream(inputStream)
-                    inputStream?.close()
-                    bitmap?.let {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                                .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
-                        )
-                    }
                 }
             }
         },

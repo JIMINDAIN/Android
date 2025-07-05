@@ -58,8 +58,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
+    implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("com.google.android.material:material:1.8.0")
+    implementation ("com.google.accompanist:accompanist-permissions:0.30.1")
 
     // 중복 제거: Compose material3, ui, ui-tooling-preview 버전 일치 확인하고 libs에 등록하는게 좋음
     // implementation ("androidx.compose.material3:material3:1.1.0")
