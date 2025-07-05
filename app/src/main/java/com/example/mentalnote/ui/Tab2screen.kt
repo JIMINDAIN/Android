@@ -1,5 +1,6 @@
 package com.example.mentalnote.ui
 
+import com.example.mentalnote.R
 import androidx.compose.runtime.Composable
 import com.example.mentalnote.model.DayRecord
 import com.example.mentalnote.ui.GalleryTab
@@ -28,16 +29,15 @@ fun Tab2Screen() {
     val sampleRecords = List(20) { index ->
         DayRecord(
             date = "2025-07-${(index + 1).toString().padStart(2, '0')}",
-            emoji = when (index % 5) {
-                0 -> "😊"
-                1 -> "😢"
-                2 -> "😡"
-                3 -> "😴"
-                else -> "😎"
+            emojiResID = when (index % 4) {
+                0 -> R.drawable.emoji_happy
+                1 -> R.drawable.emoji_bored
+                2 -> R.drawable.emoji_blue
+                else -> R.drawable.emoji_upset
             },
             summary = "샘플 요약 $index",
             detail = "샘플 상세 내용 $index",
-            imageUri = null,
+            imageUriString = null,
             imageBitmap = createSampleBitmap()
         )
     }

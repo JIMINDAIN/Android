@@ -38,8 +38,8 @@ fun MainScreen() {
 
     Box(
         modifier = Modifier
-            .fillMaxSize()   // 화면 전체 채우기
-            .background(backgroundColor)  // 배경색 지정
+            .fillMaxSize()
+            .background(backgroundColor)
     ) {
         Scaffold(
             containerColor = Color.Transparent,
@@ -72,38 +72,9 @@ fun MainScreen() {
                             }
                         }
                     )
-
-                    1 -> GalleryTab(dayRecords = dayRecords)
+                    1 -> Tab2Screen() // 혹은 GalleryTab(dayRecords = dayRecords)
                     2 -> MonthTab()
                 }
-    Scaffold(
-        bottomBar = {
-            NavigationBar {
-                tabs.forEachIndexed { index, title ->
-                    NavigationBarItem(
-                        icon = { /* 필요시 아이콘 추가 */ },
-                        label = { Text(title) },
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index }
-                    )
-                }
-            }
-        }
-    ) { innerPadding ->
-        Surface(modifier = Modifier.padding(innerPadding)) {
-            when (selectedTab) {
-                0 -> WeekTab(
-                    dayRecords = dayRecords,
-                    onSave = { record ->
-                        dayRecords = dayRecords.toMutableList().also { list ->
-                            val idx = list.indexOfFirst { it.date == record.date }
-                            if (idx >= 0) list[idx] = record else list.add(record)
-                        }
-                    }
-                )
-                //1 -> GalleryTab(dayRecords = dayRecords)
-                1 -> Tab2Screen()
-                2 -> MonthTab()
             }
         }
     }

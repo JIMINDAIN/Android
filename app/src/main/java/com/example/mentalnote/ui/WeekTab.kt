@@ -147,10 +147,10 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
             date = selectedDate!!,
             initialRecord = record,
             onDismiss = { selectedDate = null },
-            onSave = { emoji, summary, detail, imageUri, imageBitmap ->
+            onSave = { emojiResID, summary, detail, imageUri, imageBitmap ->
                 val newRecord = DayRecord(
                     date = selectedDate!!,
-                    emoji = emoji,
+                    emojiResID = emojiResID,
                     summary = summary,
                     detail = detail,
                     imageUriString = imageUri?.toString(),
@@ -270,14 +270,20 @@ fun DayDetailDialog(
     date: String,
     initialRecord: DayRecord?,
     onDismiss: () -> Unit,
-    onSave: (String, String, String, Uri?, androidx.compose.ui.graphics.ImageBitmap?) -> Unit
+    onSave: (Int?, String, String, Uri?, androidx.compose.ui.graphics.ImageBitmap?) -> Unit
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val emojiOptions = listOf(
+        R.drawable.emoji_happy,
+        R.drawable.emoji_blue,
+        R.drawable.emoji_bored,
+        R.drawable.emoji_upset
+    )
 
     var summary by remember { mutableStateOf(initialRecord?.summary ?: "") }
     var detail by remember { mutableStateOf(initialRecord?.detail ?: "") }
-    var selectedEmoji by remember { mutableStateOf(initialRecord?.emoji ?: "") }
+    var selectedEmojiRes by remember { mutableStateOf(initialRecord?.emojiResID ?: null) }
     var imageUri by remember { mutableStateOf<Uri?>(initialRecord?.imageUri) }
     var cameraBitmap by remember { mutableStateOf(initialRecord?.imageBitmap) }
     val photoUri = remember { mutableStateOf<Uri?>(null) }
@@ -364,24 +370,23 @@ fun DayDetailDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // 3. 이모지 선택
-                Text(text = "오늘의 기분 선택:")
+                Text(text = "Today's mood")
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    listOf("😃", "🥲", "😡").forEach { emoji ->
-                        Text(
-                            text = emoji,
-                            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                    emojiOptions.forEach{ resID ->
+                        Image(
+                            painter = painterResource(id = resID),
+                            contentDescription = null,
                             modifier = Modifier
-                                .clickable { selectedEmoji = emoji }
-                                .padding(4.dp)
+                                .size(48.dp)
+                                .clickable { selectedEmojiRes = resID }
                                 .border(
                                     width = 2.dp,
-                                    color = if (selectedEmoji == emoji) Color.Blue else Color.Transparent,
+                                    color = if (resID == selectedEmojiRes) Color.Black else Color.Transparent,
                                     shape = RoundedCornerShape(8.dp)
                                 )
-                                .padding(4.dp)
                         )
                     }
                 }
@@ -419,7 +424,7 @@ fun DayDetailDialog(
         },
         confirmButton = {
             TextButton(onClick = {
-                onSave(selectedEmoji, summary, detail, imageUri, cameraBitmap)
+                onSave(selectedEmojiRes, summary, detail, imageUri, cameraBitmap)
             }) {
                 Text("저장")
             }
