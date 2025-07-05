@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.example.mentalnote.model.DayRecord
 import com.example.mentalnote.ui.WeekTab
 import com.example.mentalnote.ui.GalleryTab
+import com.example.mentalnote.ui.Tab2Screen
 import com.example.mentalnote.ui.MonthTab
 import com.example.mentalnote.ui.theme.MentalNoteTheme
 
@@ -75,6 +76,34 @@ fun MainScreen() {
                     1 -> GalleryTab(dayRecords = dayRecords)
                     2 -> MonthTab()
                 }
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                tabs.forEachIndexed { index, title ->
+                    NavigationBarItem(
+                        icon = { /* 필요시 아이콘 추가 */ },
+                        label = { Text(title) },
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index }
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+        Surface(modifier = Modifier.padding(innerPadding)) {
+            when (selectedTab) {
+                0 -> WeekTab(
+                    dayRecords = dayRecords,
+                    onSave = { record ->
+                        dayRecords = dayRecords.toMutableList().also { list ->
+                            val idx = list.indexOfFirst { it.date == record.date }
+                            if (idx >= 0) list[idx] = record else list.add(record)
+                        }
+                    }
+                )
+                //1 -> GalleryTab(dayRecords = dayRecords)
+                1 -> Tab2Screen()
+                2 -> MonthTab()
             }
         }
     }

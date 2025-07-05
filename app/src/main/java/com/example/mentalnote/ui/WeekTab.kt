@@ -211,7 +211,7 @@ fun WeekRow(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(130.dp)
             .padding(8.dp)
     ) {
         Image(
