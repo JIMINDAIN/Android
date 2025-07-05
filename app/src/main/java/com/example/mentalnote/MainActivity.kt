@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.example.mentalnote.model.DayRecord
 import com.example.mentalnote.ui.WeekTab
 import com.example.mentalnote.ui.GalleryTab
+import com.example.mentalnote.ui.Tab2Screen
 import com.example.mentalnote.ui.MonthTab
 import com.example.mentalnote.ui.theme.MentalNoteTheme
 
@@ -57,7 +58,8 @@ fun MainScreen() {
                         }
                     }
                 )
-                1 -> GalleryTab(dayRecords = dayRecords)
+                //1 -> GalleryTab(dayRecords = dayRecords)
+                1 -> Tab2Screen()
                 2 -> MonthTab()
             }
         }

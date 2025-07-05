@@ -8,7 +8,7 @@ import kotlinx.serialization.Contextual
 /**
  * 요일별 기록을 나타내는 데이터 클래스
  *
- * @property day 요일 (예: "월")
+ * @property date 요일 (예: "월")
  * @property emoji 기분 이모지 (예: "😃")
  * @property summary 한 줄 요약
  * @property detail 상세 기록 (기본값: 빈 문자열)
