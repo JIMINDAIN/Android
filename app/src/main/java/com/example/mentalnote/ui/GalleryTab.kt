@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.foundation.Image
 import android.graphics.BitmapFactory
 
+
 @Composable
 fun GalleryTab(dayRecords: List<DayRecord>) {
     val context = LocalContext.current
