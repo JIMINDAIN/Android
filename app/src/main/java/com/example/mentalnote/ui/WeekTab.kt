@@ -263,6 +263,7 @@ fun WeekRow(
                         color = colorResource(id = R.color.y2k_text),
                         fontWeight = FontWeight.Bold
                     )
+
                     Spacer(modifier = Modifier.height(4.dp))
 
                     // 요약 텍스트 (있으면 표시)

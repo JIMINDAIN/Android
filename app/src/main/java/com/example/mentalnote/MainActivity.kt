@@ -24,6 +24,9 @@ import com.example.mentalnote.ui.MonthTab
 import com.example.mentalnote.ui.Tab2Screen
 import com.example.mentalnote.ui.WeekTab
 import com.example.mentalnote.ui.theme.MentalNoteTheme
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +46,7 @@ fun MainScreen() {
 
     var dayRecords by remember { mutableStateOf(listOf<DayRecord>()) }
     val backgroundColor = Color(0xFFEAFDF9)
+    val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
 
     Box(
         modifier = Modifier
@@ -56,7 +60,12 @@ fun MainScreen() {
                     tabs.forEachIndexed { index, title ->
                         NavigationBarItem(
                             icon = { /* 필요시 아이콘 추가 */ },
-                            label = { Text(title) },
+                            label = {
+                                Text(
+                                    text = title,
+                                    fontFamily = nanumFont1,
+                                    fontSize = 15.sp
+                                )},
                             selected = selectedTab == index,
                             onClick = { selectedTab = index }
                         )
