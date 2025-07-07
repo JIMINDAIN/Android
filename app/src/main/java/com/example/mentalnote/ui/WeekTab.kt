@@ -49,6 +49,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.mentalnote.ui.theme.CustomFontFamily
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.res.colorResource
@@ -77,6 +78,7 @@ suspend fun loadDayRecords(context: Context): List<DayRecord> {
         }
     }
 }
+
 
 //WeekTab을 구현하는 메인함수
 @Composable
@@ -207,106 +209,99 @@ fun WeekRow(
         DayOfWeek.SUNDAY -> Color(0xFFFFF0F5) // LavenderBlush
     }
 
-    val dayImageRes = when (localDate.dayOfWeek) {
-        DayOfWeek.MONDAY -> R.drawable.monday
-        DayOfWeek.TUESDAY -> R.drawable.tuesday
-        DayOfWeek.WEDNESDAY -> R.drawable.wednesday
-        DayOfWeek.THURSDAY -> R.drawable.thursday
-        DayOfWeek.FRIDAY -> R.drawable.friday
-        DayOfWeek.SATURDAY -> R.drawable.saturday
-        DayOfWeek.SUNDAY -> R.drawable.sunday
-    }
+    
 
-    Box(
+        
+            Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(150.dp) // 높이 약간 증가
             .padding(8.dp)
     ) {
-        // 요일 이미지 (기존 유지, Y2K 느낌에 잘 어울림)
-        Image(
-            painter = painterResource(id = dayImageRes),
-            contentDescription = null,
-            modifier = Modifier
-                .size(90.dp) // 이미지 크기 약간 증가
-                .graphicsLayer { rotationZ = -10f } // 회전 각도 조절
-                .offset(x = (-10).dp, y = (-40).dp) // 위치 조절
-                .align(Alignment.TopStart)
-                .zIndex(1f)
-        )
-
-        Card(
-            shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
-            colors = CardDefaults.cardColors(containerColor = backgroundColor), // 요일별 배경색
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.Center)
-                .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp)) // Y2K 테두리
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 80.dp, end = 16.dp, top = 8.dp, bottom = 8.dp) // 이미지 공간 확보
-                    .background(Color.Transparent),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween // 요소 간 간격 조절
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f) // 텍스트가 공간을 더 차지하도록
+                Card(
+                    shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
+                    colors = CardDefaults.cardColors(containerColor = backgroundColor), // 요일별 배경색
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // 그림자 약간 줄임
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .border(
+                            2.dp,
+                            colorResource(id = R.color.y2k_border),
+                            RoundedCornerShape(16.dp)
+                        ) // Y2K 테두리
                 ) {
-                    // 날짜 텍스트
-                    Text(
-                        text = localDate.format(java.time.format.DateTimeFormatter.ofPattern("MM/dd (E)")),
-                        fontFamily = CustomFontFamily,
-                        fontSize = 18.sp,
-                        color = colorResource(id = R.color.y2k_text),
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp, vertical = 12.dp) // 패딩 조정
+                            .background(Color.Transparent),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween // 요소 간 간격 조절
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f) // 텍스트가 공간을 더 차지하도록
+                        ) {
+                            // 요일 인디케이터 (미니멀리스트 텍스트)
+                            Text(
+                                text = localDate.dayOfWeek.toString(),
+                                fontFamily = CustomFontFamily,
+                                fontSize = 12.sp,
+                                color = colorResource(id = R.color.y2k_text).copy(alpha = 0.6f), // 연한 색상
+                                fontWeight = FontWeight.Normal
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                            // 날짜 텍스트
+                            Text(
+                                text = localDate.format(
+                                    java.time.format.DateTimeFormatter.ofPattern(
+                                        "MM/dd (E)"
+                                    )
+                                ),
+                                fontFamily = CustomFontFamily,
+                                fontSize = 26.sp,
+                                color = colorResource(id = R.color.y2k_text),
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
 
-                    // 요약 텍스트 (있으면 표시)
-                    record?.summary?.let { summary ->
-                        Text(
-                            text = summary,
-                            fontFamily = CustomFontFamily,
-                            fontSize = 14.sp,
-                            color = colorResource(id = R.color.y2k_text).copy(alpha = 0.8f),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                            // 요약 텍스트 (있으면 표시)
+                            record?.summary?.let { summary ->
+                                Text(
+                                    text = summary,
+                                    fontFamily = CustomFontFamily,
+                                    fontSize = 14.sp,
+                                    color = colorResource(id = R.color.y2k_text).copy(alpha = 0.8f),
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+
+                        // 이모지 및 클릭 영역
+                        record?.emojiResID?.let { emojiResID ->
+                            Image(
+                                painter = painterResource(id = emojiResID),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(60.dp) // 이모지 크기 증가
+                                    .clickable { onEmojiClick(record.emojiResID.toString()) } // 클릭 가능하도록
+                                    .padding(4.dp) // 패딩 추가
+                            )
+                        } ?: run { // 기록이 없을 때 이모지 선택 버튼 표시
+                            Image(
+                                painter = painterResource(id = R.drawable.emoji_add), // '+' 이모지 아이콘 (가정)
+                                contentDescription = "Add Mood",
+                                modifier = Modifier
+                                    .size(60.dp)
+                                    .clickable { onEmojiClick("add") } // 클릭 가능하도록
+                                    .padding(4.dp)
+                            )
+                        }
                     }
                 }
-
-                // 이모지 및 클릭 영역
-                record?.emojiResID?.let { emojiResID ->
-                    Image(
-                        painter = painterResource(id = emojiResID),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(60.dp) // 이모지 크기 증가
-                            .clickable { onEmojiClick(record.emojiResID.toString()) } // 클릭 가능하도록
-                            .padding(4.dp) // 패딩 추가
-                    )
-                } ?: run { // 기록이 없을 때 이모지 선택 버튼 표시
-                    Image(
-                        painter = painterResource(id = R.drawable.emoji_add), // '+' 이모지 아이콘 (가정)
-                        contentDescription = "Add Mood",
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clickable { onEmojiClick("add") } // 클릭 가능하도록
-                            .padding(4.dp)
-                    )
-                }
             }
-        }
     }
-}
-
-
-
-
 
 @Composable
 fun DayDetailDialog(
