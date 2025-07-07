@@ -66,6 +66,7 @@ suspend fun saveDayRecords(context: Context, records: List<DayRecord>) {
 }
 
 suspend fun loadDayRecords(context: Context): List<DayRecord> {
+    Log.d("loadDayRecords", "불러오기 시작")
     val prefs = context.dataStore.data.first()
     val json = prefs[DAY_RECORDS_KEY]
     return if (json == null) {
@@ -145,7 +146,7 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
             Text(
                 text = "이번주 기분을 \n 입력하세요!",
                 fontFamily = CustomFontFamily,
-                fontSize = 36.sp, // 폰트 크기
+                fontSize = 25.sp, // 폰트 크기
                 fontWeight = FontWeight.Bold,
                 color = colorResource(id = R.color.y2k_text),
                 lineHeight = 48.sp // 행간 간격 높임

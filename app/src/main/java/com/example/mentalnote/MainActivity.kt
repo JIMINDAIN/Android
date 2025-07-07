@@ -27,6 +27,10 @@ import com.example.mentalnote.ui.theme.MentalNoteTheme
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
+import com.example.mentalnote.ui.loadDayRecords
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,10 +48,15 @@ fun MainScreen() {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Week", "Gallery", "Month")
 
+    val context = LocalContext.current
     var dayRecords by remember { mutableStateOf(listOf<DayRecord>()) }
     val backgroundColor = Color(0xFFEAFDF9)
     val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
 
+    LaunchedEffect(Unit){
+        val loadedRecords = loadDayRecords(context)
+        dayRecords = loadedRecords
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -90,7 +99,7 @@ fun MainScreen() {
                         }
                     )
                     1 -> Tab2Screen() // 혹은 GalleryTab(dayRecords = dayRecords)
-                    2 -> MonthTab()
+                    2 -> MonthTab(dayRecords = dayRecords)
                 }
             }
         }
