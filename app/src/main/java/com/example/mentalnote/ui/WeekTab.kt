@@ -143,7 +143,7 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
             contentAlignment = Alignment.Center // 박스 내에서 텍스트 중앙 정렬
         ) {
             Text(
-                text = "오늘의 기분을 \n 입력하세요!",
+                text = "이번주 기분을 \n 입력하세요!",
                 fontFamily = CustomFontFamily,
                 fontSize = 36.sp, // 폰트 크기
                 fontWeight = FontWeight.Bold,
@@ -224,9 +224,9 @@ fun WeekRow(
         DayOfWeek.SUNDAY -> Color(0xFFFFF0F5) // LavenderBlush
     }
 
-    
 
-        
+
+
             Box(
         modifier = Modifier
             .fillMaxWidth()
