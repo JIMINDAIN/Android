@@ -13,23 +13,23 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.mentalnote.model.DayRecord
-import com.example.mentalnote.ui.MonthTab
-import com.example.mentalnote.ui.Tab2Screen
-import com.example.mentalnote.ui.WeekTab
-import com.example.mentalnote.ui.theme.MentalNoteTheme
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.LaunchedEffect
+import com.example.mentalnote.model.DayRecord
+import com.example.mentalnote.ui.GalleryTab
+import com.example.mentalnote.ui.MonthTab
+import com.example.mentalnote.ui.WeekTab
 import com.example.mentalnote.ui.loadDayRecords
+import com.example.mentalnote.ui.theme.MentalNoteTheme
 
 
 class MainActivity : ComponentActivity() {
@@ -98,7 +98,8 @@ fun MainScreen() {
                             }
                         }
                     )
-                    1 -> Tab2Screen() // 혹은 GalleryTab(dayRecords = dayRecords)
+                    //1 -> Tab2Screen() // 혹은
+                    1 -> GalleryTab(dayRecords = dayRecords)
                     2 -> MonthTab(dayRecords = dayRecords)
                 }
             }

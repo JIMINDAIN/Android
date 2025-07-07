@@ -22,24 +22,23 @@ fun AppHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 15.dp, horizontal = 16.dp),
+            .padding( start = 18.dp, top = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(modifier = Modifier.width(5.dp))
 
         Image(
-
-            painter = painterResource(id = R.drawable.logo_mindnote),
+            painter = painterResource(id = R.drawable.mindnote_logo),
             contentDescription = "App Logo",
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(30.dp)
         )
 
-        Spacer(modifier = Modifier.width(20.dp))
+        Spacer(modifier = Modifier.width(15.dp))
 
         Text(
             text = "mindnote",
             fontFamily = nanumFont1,
-            fontSize = 20.sp,
+            fontSize = 23.sp,
             color = Color(0xFF6B4D47) // 갈색
         )
     }
