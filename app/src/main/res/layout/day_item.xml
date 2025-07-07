@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/day_text"
-        android:textSize="12sp"
+        android:textSize="10sp"
         android:textColor="@android:color/black"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
@@ -15,8 +15,8 @@
 
     <TextView
         android:id="@+id/day_emoji"
-        android:textSize="24sp"
-        android:layout_marginTop="2dp"
+        android:textSize="29sp"
+        android:layout_marginTop="0dp"
         android:layout_gravity="center_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
