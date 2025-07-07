@@ -1,18 +1,19 @@
 package com.example.mentalnote.ui
 
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -20,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,12 +43,11 @@ import com.example.mentalnote.model.DayRecord
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.view.CalendarView
 import com.kizitonwose.calendar.view.MonthDayBinder
-import com.kizitonwose.calendar.view.ViewContainer
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 
-val nanumFont1 = FontFamily(Font(R.font.gangwon_bold))
+val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
 val nanumFont2 = FontFamily(Font(R.font.gangwon_light))
 
 val testDayRecords = mutableStateMapOf<LocalDate, DayRecord>(
@@ -58,18 +59,17 @@ val testDayRecords = mutableStateMapOf<LocalDate, DayRecord>(
     ),
     LocalDate.of(2025, 7, 2) to DayRecord(
         date = "2025-07-02",
-        emojiResID = R.drawable.emoji_sad,
+        emojiResID = R.drawable.emoji_bored,
         summary = "조금 슬펐던 날",
         detail = "비가 와서 나가지 못함"
     ),
     LocalDate.of(2025, 7, 3) to DayRecord(
         date = "2025-07-03",
-        emojiResID = R.drawable.emoji_angry,
+        emojiResID = R.drawable.emoji_upset,
         summary = "짜증났던 날",
         detail = "버스 놓치고 지각함"
     )
 )
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,17 +81,25 @@ fun MonthTab() {
     val selectedDate = remember { mutableStateOf<LocalDate?>(null) }
 
     Column{
+        AppHeader()
+
         CenterAlignedTopAppBar(
+            //modifier = Modifier.height(50.dp),
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color(0xFFEAFDF9),
+            ),
             title = {
                 Text(
                     text = "${currentMonth.year}. ${currentMonth.monthValue}",
                     color = Color.DarkGray,
                     fontFamily = nanumFont1,
+
                     //textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleSmall.copy(fontSize = 17.sp),
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 20.sp),
                     //modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
                 )
             },
+
             navigationIcon = {
                 IconButton(onClick = {
                     currentMonth = currentMonth.minusMonths(1)
@@ -155,14 +163,9 @@ fun MonthTab() {
 
                         container.day = data
                         container.textView.text = data.date.dayOfMonth.toString()
-                        val emojiResId = testDayRecords[data.date]?.emojiResID
-                        if (emojiResId != null && emojiResId != 0) {
-                            container.emojiView.setImageResource(emojiResId)
-                            container.emojiView.visibility = View.VISIBLE
-                        } else {
-                            container.emojiView.visibility = View.GONE
+                        testDayRecords[data.date]?.emojiResID?.let {
+                            container.emojiView.setImageResource(it)
                         }
-
 
                         container.view.setOnClickListener {
                             println("선택한 날짜: ${data.date}")
@@ -217,30 +220,34 @@ fun MonthTab() {
             } else{
                 Column(
                 ){
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                    ) {
-                        // 왼쪽: 이모지
-                        record.emojiResID?.let {
+                    Card(
+
+                    ){
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        ) {
+                            // 왼쪽: 이모지
                             Image(
-                                painter = painterResource(id = it),
-                                contentDescription = "Emoji",
-                                modifier = Modifier.size(40.dp).padding(end = 8.dp)
+                                painter = painterResource(id = record.emojiResID ?: R.drawable.emoji_happy),
+                                contentDescription = null,
+                                modifier = Modifier.size(40.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            // 오른쪽: summary
+                            Text(
+                                text = record.summary,
+                                fontFamily = nanumFont1,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontSize = 20.sp,
+                                modifier = Modifier.weight(1f)
                             )
                         }
-
-                        // 오른쪽: summary
-                        Text(
-                            text = record.summary,
-                            fontFamily = nanumFont1,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontSize = 20.sp,
-                            modifier = Modifier.weight(1f)
-                        )
                     }
 
                     /*HorizontalDivider(
@@ -251,7 +258,7 @@ fun MonthTab() {
 
                     Text(
                         text = record.detail,
-                        fontFamily = nanumFont2,
+                        fontFamily = nanumFont1,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.Black,
                         fontSize = 20.sp,
