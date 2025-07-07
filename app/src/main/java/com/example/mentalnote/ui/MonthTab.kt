@@ -2,25 +2,18 @@ package com.example.mentalnote.ui
 
 import android.view.View
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -32,21 +25,16 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -58,6 +46,23 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.CardColors
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.border
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.colorResource
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.unit.sp
 
 
 val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
@@ -84,36 +89,17 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                 containerColor = Color(0xFFEAFDF9),
             ),
             title = {
-                Card(
-                    shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFFFFDF0)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(35.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .border(0.5.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
-                ){
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ){
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(style = SpanStyle(fontSize = 15.sp)) { append("💖 ") } // 작은 하트
-                                withStyle(style = SpanStyle(fontSize = 20.sp)) { append("${currentMonth.year}. ${currentMonth.monthValue} ") }
-                                withStyle(style = SpanStyle(fontSize = 15.sp)) { append("💖") } // 작은 하트
-                            },color = Color.Black,
-                            fontFamily = nanumFont1,
-                            //textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 15.sp),
-                            //modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
-                        )
-                    }
-                }
-
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontSize = 15.sp)) { append("💖 ") } // 작은 하트
+                        withStyle(style = SpanStyle(fontSize = 20.sp)) { append("${currentMonth.year}. ${currentMonth.monthValue} ") }
+                        withStyle(style = SpanStyle(fontSize = 15.sp)) { append("💖") } // 작은 하트
+                    },color = Color.Black,
+                    fontFamily = nanumFont1,
+                    //textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 15.sp),
+                    //modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
+                )
             },
 
             navigationIcon = {
@@ -156,7 +142,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
-                    .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
+                    .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
             ){
                 Column(
                     modifier = Modifier
@@ -276,7 +262,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.CenterHorizontally)
-                            .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
+                            .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
                     ){
                         Row(
                             modifier = Modifier
@@ -322,7 +308,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                             .fillMaxWidth()
                             .align(Alignment.CenterHorizontally)
                             .heightIn(min = 120.dp)
-                            .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
+                            .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
                     ){
                         Text(
                             text = record.detail,
