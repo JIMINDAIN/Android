@@ -1,58 +1,76 @@
 package com.example.mentalnote.ui
 
-import androidx.compose.ui.zIndex
-import androidx.compose.ui.graphics.graphicsLayer
-import com.example.mentalnote.R
-import com.google.accompanist.permissions.*
-import android.content.Context
 import android.Manifest
-import androidx.core.content.ContextCompat
+import android.content.Context
 import android.content.pm.PackageManager
-import androidx.compose.ui.res.painterResource
-import androidx.compose.foundation.Image
-import android.util.Log
-import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import coil.compose.rememberAsyncImagePainter
+import com.example.mentalnote.R
 import com.example.mentalnote.dataStore
 import com.example.mentalnote.model.DayRecord
+import com.example.mentalnote.ui.theme.CustomFontFamily
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.core.edit
 import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
-import androidx.core.content.FileProvider
-import coil.compose.rememberAsyncImagePainter
-import com.example.mentalnote.ui.theme.CustomFontFamily
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.alpha
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.res.colorResource
 
 
 val DAY_RECORDS_KEY = stringPreferencesKey("day_records")
@@ -134,35 +152,40 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            //.padding(16.dp)
             .verticalScroll(scrollState)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.25f), // 세로 길이의 1/4 차지
-            contentAlignment = Alignment.Center // 박스 내에서 텍스트 중앙 정렬
-        ) {
-            Text(
-                text = "오늘의 기분을 입력하세요!",
+        AppHeader()
+        Spacer(modifier = Modifier.height(10.dp))
+        Column(modifier = Modifier.padding(8.dp)){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.25f), // 세로 길이의 1/4 차지
+                contentAlignment = Alignment.Center // 박스 내에서 텍스트 중앙 정렬
+            ) {
+                Text(
+                    text = "오늘의 기분을 입력하세요!",
 
-                fontFamily = CustomFontFamily,
-                fontSize = 20.sp, // 폰트 크기
-                fontWeight = FontWeight.Bold,
-                color = colorResource(id = R.color.y2k_text),
-                lineHeight = 30.sp // 행간 간격 높임
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        weekDateStrings.forEach { dateStr ->
-            val record = weekRecords.find { it.date == dateStr }
-            WeekRow(date = dateStr, record = record, onEmojiClick = { selectedEmoji ->
-                // 클릭 시 DayDetailDialog 열기
-                selectedDate = dateStr
-                // 나중에 selectedEmoji 값도 Dialog에 넘길 수 있음
-            })
+                    fontFamily = CustomFontFamily,
+                    fontSize = 20.sp, // 폰트 크기
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(id = R.color.y2k_text),
+                    lineHeight = 30.sp // 행간 간격 높임
+                )
+            }
+            Spacer(modifier = Modifier.height(3.dp))
 
-            Spacer(modifier = Modifier.height(4.dp))
+            weekDateStrings.forEach { dateStr ->
+                val record = weekRecords.find { it.date == dateStr }
+                WeekRow(date = dateStr, record = record, onEmojiClick = { selectedEmoji ->
+                    // 클릭 시 DayDetailDialog 열기
+                    selectedDate = dateStr
+                    // 나중에 selectedEmoji 값도 Dialog에 넘길 수 있음
+                })
+
+                Spacer(modifier = Modifier.height(2.dp))
+            }
         }
     }
 
@@ -226,13 +249,10 @@ fun WeekRow(
         DayOfWeek.SUNDAY -> Color(0xFFFFF0F5) // LavenderBlush
     }
 
-
-
-
-            Box(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp) // 높이 약간 증가
+            .height(130.dp) // 높이 약간 증가
             .padding(8.dp)
     ) {
                 Card(
@@ -242,7 +262,7 @@ fun WeekRow(
                     modifier = Modifier
                         .fillMaxSize()
                         .border(
-                            2.dp,
+                            1.dp,
                             colorResource(id = R.color.y2k_border),
                             RoundedCornerShape(16.dp)
                         ) // Y2K 테두리
@@ -250,7 +270,7 @@ fun WeekRow(
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 16.dp, vertical = 12.dp) // 패딩 조정
+                            .padding(horizontal = 25.dp, vertical = 12.dp) // 패딩 조정
                             .background(Color.Transparent),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween // 요소 간 간격 조절
@@ -262,11 +282,11 @@ fun WeekRow(
                             Text(
                                 text = localDate.dayOfWeek.toString(),
                                 fontFamily = CustomFontFamily,
-                                fontSize = 12.sp,
-                                color = colorResource(id = R.color.y2k_text).copy(alpha = 0.6f), // 연한 색상
+                                fontSize = 15.sp,
+                                color = colorResource(id = R.color.y2k_text).copy(alpha = 0.8f), // 연한 색상
                                 fontWeight = FontWeight.Normal
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(2.dp))
 
                             // 날짜 텍스트
                             Text(
@@ -287,8 +307,8 @@ fun WeekRow(
                                 Text(
                                     text = summary,
                                     fontFamily = CustomFontFamily,
-                                    fontSize = 14.sp,
-                                    color = colorResource(id = R.color.y2k_text).copy(alpha = 0.8f),
+                                    fontSize = 16.sp,
+                                    color = colorResource(id = R.color.y2k_text),//.copy(alpha = 0.8f),
                                     maxLines = 2,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -310,7 +330,7 @@ fun WeekRow(
                                 painter = painterResource(id = R.drawable.emoji_add), // '+' 이모지 아이콘 (가정)
                                 contentDescription = "Add Mood",
                                 modifier = Modifier
-                                    .size(60.dp)
+                                    .size(40.dp)
                                     .clickable { onEmojiClick("add") } // 클릭 가능하도록
                                     .padding(4.dp)
                             )
@@ -376,7 +396,11 @@ fun DayDetailDialog(
 
     fun launchCamera() {
         if (hasCameraPermission) {
-            val file = File(context.cacheDir, "captured_${System.currentTimeMillis()}.jpg")
+            val photosDir = File(context.getExternalFilesDir(null), "photos")
+            if(!photosDir.exists()){
+                photosDir.mkdirs()
+            }
+            val file = File(photosDir, "captured_${System.currentTimeMillis()}.jpg")
             val uri = FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
@@ -395,7 +419,7 @@ fun DayDetailDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp)),
+                .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp)),
             colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.y2k_background))
         ) {
             Column(
