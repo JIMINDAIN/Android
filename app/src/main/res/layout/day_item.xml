@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <TextView
+    <ImageView
         android:id="@+id/day_emoji"
         android:textSize="29sp"
         android:layout_marginTop="0dp"
