@@ -58,11 +58,12 @@ import androidx.compose.foundation.border
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.colorResource
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.platform.LocalContext
 
 val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
 val nanumFont2 = FontFamily(Font(R.font.gangwon_light))
 
-val testDayRecords = mutableStateMapOf<LocalDate, DayRecord>(
+/*val testDayRecords = mutableStateMapOf<LocalDate, DayRecord>(
     LocalDate.of(2025, 7, 1) to DayRecord(
         date = "2025-07-01",
         emojiResID = R.drawable.emoji_happy,
@@ -81,16 +82,19 @@ val testDayRecords = mutableStateMapOf<LocalDate, DayRecord>(
         summary = "짜증났던 날",
         detail = "버스 놓치고 지각함"
     )
-)
+)*/
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MonthTab() {
+fun MonthTab(dayRecords : List<DayRecord>) {
+    val context = LocalContext.current
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     val calendarViewState = remember { mutableStateOf<CalendarView?>(null) }
     val daysOfWeek = listOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
     val selectedDate = remember { mutableStateOf<LocalDate?>(null) }
+    //var dayRecords by remember {mutableStateOf<List<DayRecord>>(emptyList()) }
+    val dayRecordMap : Map<LocalDate, DayRecord> = dayRecords.associateBy {LocalDate.parse(it.date)}
 
     Column{
         AppHeader()
@@ -137,7 +141,6 @@ fun MonthTab() {
         )*/
 
 
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -159,7 +162,6 @@ fun MonthTab() {
                         .fillMaxWidth()
                         .padding(16.dp)
                 ){
-
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -199,7 +201,7 @@ fun MonthTab() {
 
                                     container.day = data
                                     container.textView.text = data.date.dayOfMonth.toString()
-                                    testDayRecords[data.date]?.emojiResID?.let {
+                                    dayRecordMap[data.date]?.emojiResID?.let {
                                         container.emojiView.setImageResource(it)
                                     }
 
@@ -245,7 +247,7 @@ fun MonthTab() {
 
 
         selectedDate.value?.let { date ->
-            val record = testDayRecords[date]
+            val record = dayRecordMap[date]
 
             if(record == null){
                 Text(
