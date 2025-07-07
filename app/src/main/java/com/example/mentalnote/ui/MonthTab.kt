@@ -59,30 +59,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.colorResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.unit.sp
+
 
 val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
 val nanumFont2 = FontFamily(Font(R.font.gangwon_light))
-
-/*val testDayRecords = mutableStateMapOf<LocalDate, DayRecord>(
-    LocalDate.of(2025, 7, 1) to DayRecord(
-        date = "2025-07-01",
-        emojiResID = R.drawable.emoji_happy,
-        summary = "기분 좋았던 날",
-        detail = "하늘이 맑고 기분 좋은 산책을 했음"
-    ),
-    LocalDate.of(2025, 7, 2) to DayRecord(
-        date = "2025-07-02",
-        emojiResID = R.drawable.emoji_bored,
-        summary = "조금 슬펐던 날",
-        detail = "비가 와서 나가지 못함"
-    ),
-    LocalDate.of(2025, 7, 3) to DayRecord(
-        date = "2025-07-03",
-        emojiResID = R.drawable.emoji_upset,
-        summary = "짜증났던 날",
-        detail = "버스 놓치고 지각함"
-    )
-)*/
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,11 +90,14 @@ fun MonthTab(dayRecords : List<DayRecord>) {
             ),
             title = {
                 Text(
-                    text = "${currentMonth.year}. ${currentMonth.monthValue}",
-                    color = Color.DarkGray,
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontSize = 15.sp)) { append("💖 ") } // 작은 하트
+                        withStyle(style = SpanStyle(fontSize = 20.sp)) { append("${currentMonth.year}. ${currentMonth.monthValue} ") }
+                        withStyle(style = SpanStyle(fontSize = 15.sp)) { append("💖") } // 작은 하트
+                    },color = Color.Black,
                     fontFamily = nanumFont1,
                     //textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 20.sp),
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 15.sp),
                     //modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
                 )
             },
@@ -269,7 +256,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                     Card(
                         shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFFFACD)
+                            containerColor = Color(0xFFFFFDF0)
                         ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
                         modifier = Modifier
