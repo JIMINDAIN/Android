@@ -1,6 +1,9 @@
 package com.example.mentalnote.ui
 
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +41,7 @@ import com.example.mentalnote.model.DayRecord
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.view.CalendarView
 import com.kizitonwose.calendar.view.MonthDayBinder
+import com.kizitonwose.calendar.view.ViewContainer
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -47,23 +52,24 @@ val nanumFont2 = FontFamily(Font(R.font.gangwon_light))
 val testDayRecords = mutableStateMapOf<LocalDate, DayRecord>(
     LocalDate.of(2025, 7, 1) to DayRecord(
         date = "2025-07-01",
-        emoji = "😊",
+        emojiResID = R.drawable.emoji_happy,
         summary = "기분 좋았던 날",
         detail = "하늘이 맑고 기분 좋은 산책을 했음"
     ),
     LocalDate.of(2025, 7, 2) to DayRecord(
         date = "2025-07-02",
-        emoji = "😢",
+        emojiResID = R.drawable.emoji_sad,
         summary = "조금 슬펐던 날",
         detail = "비가 와서 나가지 못함"
     ),
     LocalDate.of(2025, 7, 3) to DayRecord(
         date = "2025-07-03",
-        emoji = "😡",
+        emojiResID = R.drawable.emoji_angry,
         summary = "짜증났던 날",
         detail = "버스 놓치고 지각함"
     )
 )
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -149,7 +155,13 @@ fun MonthTab() {
 
                         container.day = data
                         container.textView.text = data.date.dayOfMonth.toString()
-                        container.emojiView.text = testDayRecords[data.date] ?.emoji ?: ""
+                        val emojiResId = testDayRecords[data.date]?.emojiResID
+                        if (emojiResId != null && emojiResId != 0) {
+                            container.emojiView.setImageResource(emojiResId)
+                            container.emojiView.visibility = View.VISIBLE
+                        } else {
+                            container.emojiView.visibility = View.GONE
+                        }
 
 
                         container.view.setOnClickListener {
@@ -213,11 +225,13 @@ fun MonthTab() {
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
                         // 왼쪽: 이모지
-                        Text(
-                            text = record.emoji,
-                            fontSize = 40.sp, // 이모지 크게
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
+                        record.emojiResID?.let {
+                            Image(
+                                painter = painterResource(id = it),
+                                contentDescription = "Emoji",
+                                modifier = Modifier.size(40.dp).padding(end = 8.dp)
+                            )
+                        }
 
                         // 오른쪽: summary
                         Text(

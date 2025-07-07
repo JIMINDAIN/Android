@@ -13,13 +13,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <TextView
+    <ImageView
         android:id="@+id/day_emoji"
-        android:textSize="29sp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_marginTop="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_gravity="center_horizontal" />
 
 
 
