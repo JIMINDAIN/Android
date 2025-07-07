@@ -135,8 +135,23 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
             .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(scrollState)
-//            .background(Color(0xffe3ffea))
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.25f), // 세로 길이의 1/4 차지
+            contentAlignment = Alignment.Center // 박스 내에서 텍스트 중앙 정렬
+        ) {
+            Text(
+                text = "오늘의 기분을 \n 입력하세요!",
+                fontFamily = CustomFontFamily,
+                fontSize = 36.sp, // 폰트 크기
+                fontWeight = FontWeight.Bold,
+                color = colorResource(id = R.color.y2k_text),
+                lineHeight = 48.sp // 행간 간격 높임
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
         weekDateStrings.forEach { dateStr ->
             val record = weekRecords.find { it.date == dateStr }
             WeekRow(date = dateStr, record = record, onEmojiClick = { selectedEmoji ->
