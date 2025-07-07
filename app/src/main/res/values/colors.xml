@@ -7,4 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Y2K Palette -->
+    <color name="y2k_background">#FFFACD</color> <!-- LemonChiffon -->
+    <color name="y2k_primary">#FFB6C1</color> <!-- LightPink -->
+    <color name="y2k_secondary">#ADD8E6</color> <!-- LightBlue -->
+    <color name="y2k_text">#333333</color>
+    <color name="y2k_border">#000000</color>
 </resources>

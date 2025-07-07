@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import com.example.mentalnote.dataStore
@@ -45,6 +46,12 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import androidx.core.content.FileProvider
 import coil.compose.rememberAsyncImagePainter
+import com.example.mentalnote.ui.theme.CustomFontFamily
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.draw.clip
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.res.colorResource
 
 
 val DAY_RECORDS_KEY = stringPreferencesKey("day_records")
@@ -188,14 +195,16 @@ fun WeekRow(
 ) {
     val localDate = LocalDate.parse(date)
     val dayofWeek = localDate.dayOfWeek
+
+    // Y2K 느낌의 파스텔 배경색
     val backgroundColor = when (dayofWeek) {
-        DayOfWeek.MONDAY -> Color(0xffffe3e3)
-        DayOfWeek.TUESDAY -> Color(0xffffe7cb)
-        DayOfWeek.WEDNESDAY -> Color(0xfffffecb)
-        DayOfWeek.THURSDAY -> Color(0xffe1ffcb)
-        DayOfWeek.FRIDAY -> Color(0xffcbfffc)
-        DayOfWeek.SATURDAY -> Color(0xffffe1e1)
-        DayOfWeek.SUNDAY -> Color(0xfffce1ff)
+        DayOfWeek.MONDAY -> Color(0xFFF0F8FF) // AliceBlue
+        DayOfWeek.TUESDAY -> Color(0xFFF5FFFA) // MintCream
+        DayOfWeek.WEDNESDAY -> Color(0xFFFFFACD) // LemonChiffon
+        DayOfWeek.THURSDAY -> Color(0xFFE0FFFF) // LightCyan
+        DayOfWeek.FRIDAY -> Color(0xFFF0FFFF) // Azure
+        DayOfWeek.SATURDAY -> Color(0xFFFAEBD7) // AntiqueWhite
+        DayOfWeek.SUNDAY -> Color(0xFFFFF0F5) // LavenderBlush
     }
 
     val dayImageRes = when (localDate.dayOfWeek) {
@@ -211,56 +220,89 @@ fun WeekRow(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(130.dp)
+            .height(150.dp) // 높이 약간 증가
             .padding(8.dp)
     ) {
+        // 요일 이미지 (기존 유지, Y2K 느낌에 잘 어울림)
         Image(
             painter = painterResource(id = dayImageRes),
             contentDescription = null,
             modifier = Modifier
-                .size(80.dp)
-                .graphicsLayer { rotationZ = -15f }
-                .offset(x = -8.dp, y = -35.dp)
+                .size(90.dp) // 이미지 크기 약간 증가
+                .graphicsLayer { rotationZ = -10f } // 회전 각도 조절
+                .offset(x = (-10).dp, y = (-40).dp) // 위치 조절
                 .align(Alignment.TopStart)
                 .zIndex(1f)
         )
 
         Card(
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = backgroundColor),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
+            colors = CardDefaults.cardColors(containerColor = backgroundColor), // 요일별 배경색
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.Center)
+                .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp)) // Y2K 테두리
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(8.dp)
+                    .padding(start = 80.dp, end = 16.dp, top = 8.dp, bottom = 8.dp) // 이미지 공간 확보
                     .background(Color.Transparent),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly // 대칭 배치
+                horizontalArrangement = Arrangement.SpaceBetween // 요소 간 간격 조절
             ) {
-                val emojis = listOf(
-                    R.drawable.emoji_happy to "happy",
-                    R.drawable.emoji_bored to "bored",
-                    R.drawable.emoji_blue to "blue",
-                    R.drawable.emoji_upset to "upset"
-                )
+                Column(
+                    modifier = Modifier.weight(1f) // 텍스트가 공간을 더 차지하도록
+                ) {
+                    // 날짜 텍스트
+                    Text(
+                        text = localDate.format(java.time.format.DateTimeFormatter.ofPattern("MM/dd (E)")),
+                        fontFamily = CustomFontFamily,
+                        fontSize = 18.sp,
+                        color = colorResource(id = R.color.y2k_text),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                emojis.forEach { (resId, emojiName) ->
+                    // 요약 텍스트 (있으면 표시)
+                    record?.summary?.let { summary ->
+                        Text(
+                            text = summary,
+                            fontFamily = CustomFontFamily,
+                            fontSize = 14.sp,
+                            color = colorResource(id = R.color.y2k_text).copy(alpha = 0.8f),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                // 이모지 및 클릭 영역
+                record?.emojiResID?.let { emojiResID ->
                     Image(
-                        painter = painterResource(id = resId),
-                        contentDescription = emojiName,
+                        painter = painterResource(id = emojiResID),
+                        contentDescription = null,
                         modifier = Modifier
-                            .size(48.dp)
-                            .clickable { onEmojiClick(emojiName) }
+                            .size(60.dp) // 이모지 크기 증가
+                            .clickable { onEmojiClick(record.emojiResID.toString()) } // 클릭 가능하도록
+                            .padding(4.dp) // 패딩 추가
+                    )
+                } ?: run { // 기록이 없을 때 이모지 선택 버튼 표시
+                    Image(
+                        painter = painterResource(id = R.drawable.emoji_add), // '+' 이모지 아이콘 (가정)
+                        contentDescription = "Add Mood",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clickable { onEmojiClick("add") } // 클릭 가능하도록
+                            .padding(4.dp)
                     )
                 }
             }
         }
     }
 }
+
 
 
 
@@ -288,7 +330,6 @@ fun DayDetailDialog(
     var cameraBitmap by remember { mutableStateOf(initialRecord?.imageBitmap) }
     val photoUri = remember { mutableStateOf<Uri?>(null) }
 
-    // 권한 상태 체크
     var hasCameraPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
@@ -296,14 +337,12 @@ fun DayDetailDialog(
         )
     }
 
-    // 권한 요청 런처
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         hasCameraPermission = granted
     }
 
-    // 사진 촬영 런처
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
@@ -313,7 +352,6 @@ fun DayDetailDialog(
         }
     }
 
-    // 갤러리 선택 런처 (기존 유지)
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -325,7 +363,6 @@ fun DayDetailDialog(
 
     fun launchCamera() {
         if (hasCameraPermission) {
-            // 권한 있으면 촬영 실행
             val file = File(context.cacheDir, "captured_${System.currentTimeMillis()}.jpg")
             val uri = FileProvider.getUriForFile(
                 context,
@@ -335,104 +372,171 @@ fun DayDetailDialog(
             photoUri.value = uri
             cameraLauncher.launch(uri)
         } else {
-            // 권한 없으면 요청
             permissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("오늘은 어떤 일이 있었나요?") },
-        text = {
-            Column {
-                // 1. 한 줄 요약 입력
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp)),
+            colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.y2k_background))
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "💖 ${LocalDate.parse(date).dayOfWeek}의 기록 💖",
+                    fontFamily = CustomFontFamily,
+                    fontSize = 22.sp,
+                    color = colorResource(id = R.color.y2k_text)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 1. 한 줄 요약
                 TextField(
                     value = summary,
                     onValueChange = { summary = it },
-                    placeholder = { Text("한 줄 요약") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    placeholder = { Text("한 줄 요약...", fontFamily = CustomFontFamily, color = Color.Gray) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(8.dp)),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        cursorColor = colorResource(id = R.color.y2k_primary),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    textStyle = LocalTextStyle.current.copy(fontFamily = CustomFontFamily, color = colorResource(id = R.color.y2k_text)),
                     singleLine = true
                 )
-                Spacer(modifier = Modifier.height(8.dp))
 
-                // 2. 상세 기록 입력
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // 2. 상세 기록
                 TextField(
                     value = detail,
                     onValueChange = { detail = it },
-                    placeholder = { Text("상세 기록") },
+                    placeholder = { Text("자세한 이야기를 들려주세요...", fontFamily = CustomFontFamily, color = Color.Gray) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp),
-                    maxLines = 10
+                        .height(150.dp)
+                        .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(8.dp)),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        cursorColor = colorResource(id = R.color.y2k_primary),
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    textStyle = LocalTextStyle.current.copy(fontFamily = CustomFontFamily, color = colorResource(id = R.color.y2k_text))
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // 3. 이모지 선택
-                Text(text = "Today's mood")
+                Text("✨ 오늘의 기분은? ✨", fontFamily = CustomFontFamily, fontSize = 18.sp, color = colorResource(id = R.color.y2k_text))
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    emojiOptions.forEach{ resID ->
-                        Image(
-                            painter = painterResource(id = resID),
-                            contentDescription = null,
+                    emojiOptions.forEach { resID ->
+                        Box(
                             modifier = Modifier
-                                .size(48.dp)
+                                .size(54.dp)
                                 .clickable { selectedEmojiRes = resID }
+                                .background(
+                                    if (resID == selectedEmojiRes) colorResource(id = R.color.y2k_primary) else Color.Transparent,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
                                 .border(
                                     width = 2.dp,
-                                    color = if (resID == selectedEmojiRes) Color.Black else Color.Transparent,
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                        )
+                                    color = if (resID == selectedEmojiRes) colorResource(id = R.color.y2k_border) else Color.LightGray,
+                                    shape = RoundedCornerShape(12.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = resID),
+                                contentDescription = null,
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // 사진 선택 & 촬영 버튼
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Button(onClick = { galleryLauncher.launch("image/*") }) {
-                        Text("사진 선택")
-                    }
-                    Button(onClick = { launchCamera() }) {
-                        Text("사진 촬영")
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // 사진 미리보기
                 imageUri?.let {
-                    val painter = rememberAsyncImagePainter(model = it)
                     Image(
-                        painter = painter,
-                        contentDescription = null,
+                        painter = rememberAsyncImagePainter(model = it),
+                        contentDescription = "Selected image",
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
-                            .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(12.dp))
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                // 버튼
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = { galleryLauncher.launch("image/*") },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.y2k_secondary)),
+                        border = BorderStroke(1.dp, colorResource(id = R.color.y2k_border))
+                    ) {
+                        Text("갤러리", fontFamily = CustomFontFamily, color = colorResource(id = R.color.y2k_text))
+                    }
+                    Button(
+                        onClick = { launchCamera() },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.y2k_secondary)),
+                        border = BorderStroke(1.dp, colorResource(id = R.color.y2k_border))
+                    ) {
+                        Text("사진찍기", fontFamily = CustomFontFamily, color = colorResource(id = R.color.y2k_text))
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 저장 및 취소 버튼
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = { onSave(selectedEmojiRes, summary, detail, imageUri, cameraBitmap) },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.y2k_primary)),
+                        border = BorderStroke(1.dp, colorResource(id = R.color.y2k_border)),
+                        modifier = Modifier.width(120.dp)
+                    ) {
+                        Text("저장할래!", fontFamily = CustomFontFamily, color = colorResource(id = R.color.y2k_text))
+                    }
+                    Spacer(modifier = Modifier.width(20.dp))
+                    Button(
+                        onClick = onDismiss,
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        border = BorderStroke(1.dp, colorResource(id = R.color.y2k_border)),
+                        modifier = Modifier.width(120.dp)
+                    ) {
+                        Text("다음에...", fontFamily = CustomFontFamily, color = colorResource(id = R.color.y2k_text))
+                    }
                 }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                onSave(selectedEmojiRes, summary, detail, imageUri, cameraBitmap)
-            }) {
-                Text("저장")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("취소")
-            }
         }
-    )
+    }
 }
