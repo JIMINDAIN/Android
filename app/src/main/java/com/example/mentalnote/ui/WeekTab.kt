@@ -145,6 +145,7 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
         ) {
             Text(
                 text = "오늘의 기분을 입력하세요!",
+
                 fontFamily = CustomFontFamily,
                 fontSize = 20.sp, // 폰트 크기
                 fontWeight = FontWeight.Bold,
@@ -225,9 +226,9 @@ fun WeekRow(
         DayOfWeek.SUNDAY -> Color(0xFFFFF0F5) // LavenderBlush
     }
 
-    
 
-        
+
+
             Box(
         modifier = Modifier
             .fillMaxWidth()
