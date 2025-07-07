@@ -46,6 +46,18 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.CardColors
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.border
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.colorResource
+import androidx.compose.foundation.layout.*
 
 val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
 val nanumFont2 = FontFamily(Font(R.font.gangwon_light))
@@ -93,7 +105,6 @@ fun MonthTab() {
                     text = "${currentMonth.year}. ${currentMonth.monthValue}",
                     color = Color.DarkGray,
                     fontFamily = nanumFont1,
-
                     //textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 20.sp),
                     //modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
@@ -118,79 +129,107 @@ fun MonthTab() {
             }
         )
 
-        HorizontalDivider(
+
+        /*HorizontalDivider(
             thickness = 1.dp,
             color = Color.LightGray,
             //modifier = Modifier.padding(bottom = 16.dp)
-        )
+        )*/
 
-        Row(
+
+
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceAround
+                .padding(horizontal = 16.dp)
         ){
-            for (day in daysOfWeek) {
-                Text(
-                    text = day,
-                    fontFamily = nanumFont1,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.labelSmall,
-                    textAlign = TextAlign.Center
-                )
+            Card(
+                shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFFFF8FA)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
+                    .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
+            ){
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ){
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 1.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        for (day in daysOfWeek) {
+                            Text(
+                                text = day,
+                                fontFamily = nanumFont1,
+                                modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.titleSmall,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = Color.LightGray,
+                        //modifier = Modifier.padding(vertical = 16.dp)
+                    )
+
+                    AndroidView(
+                        factory = { ctx ->
+                            val calendarView = CalendarView(ctx).apply {
+                                dayViewResource = R.layout.day_item
+                                //pagedScroll = true
+                            }
+
+                            calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
+                                override fun create(view: View): DayViewContainer {
+                                    return DayViewContainer(view)
+                                }
+
+                                override fun bind(container: DayViewContainer, data: CalendarDay) {
+
+                                    container.day = data
+                                    container.textView.text = data.date.dayOfMonth.toString()
+                                    testDayRecords[data.date]?.emojiResID?.let {
+                                        container.emojiView.setImageResource(it)
+                                    }
+
+                                    container.view.setOnClickListener {
+                                        println("선택한 날짜: ${data.date}")
+                                        selectedDate.value = data.date
+                                    }
+                                }
+                            }
+
+                            calendarView.monthScrollListener = { month ->
+                                currentMonth = month.yearMonth
+                            }
+
+                            val today = YearMonth.now()
+                            calendarView.setup(
+                                startMonth = today.minusMonths(12),
+                                endMonth = today.plusMonths(12),
+                                firstDayOfWeek = DayOfWeek.SUNDAY
+                            )
+                            calendarView.scrollToMonth(today)
+
+                            calendarViewState.value = calendarView
+                            calendarView
+                        },
+                        modifier = Modifier
+                    )
+                }
             }
         }
-
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = Color.LightGray,
-            //modifier = Modifier.padding(vertical = 16.dp)
-        )
-
-        AndroidView(
-            factory = { ctx ->
-                val calendarView = CalendarView(ctx).apply {
-                    dayViewResource = R.layout.day_item
-                    //pagedScroll = true
-                }
-
-                calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
-                    override fun create(view: View): DayViewContainer {
-                        return DayViewContainer(view)
-                    }
-
-                    override fun bind(container: DayViewContainer, data: CalendarDay) {
-
-                        container.day = data
-                        container.textView.text = data.date.dayOfMonth.toString()
-                        testDayRecords[data.date]?.emojiResID?.let {
-                            container.emojiView.setImageResource(it)
-                        }
-
-                        container.view.setOnClickListener {
-                            println("선택한 날짜: ${data.date}")
-                            selectedDate.value = data.date
-                        }
-                    }
-                }
-
-                calendarView.monthScrollListener = { month ->
-                    currentMonth = month.yearMonth
-                }
-
-                val today = YearMonth.now()
-                calendarView.setup(
-                    startMonth = today.minusMonths(12),
-                    endMonth = today.plusMonths(12),
-                    firstDayOfWeek = DayOfWeek.SUNDAY
-                )
-                calendarView.scrollToMonth(today)
-
-                calendarViewState.value = calendarView
-                calendarView
-            },
-            modifier = Modifier
-        )
 
         LaunchedEffect(currentMonth) {
             calendarViewState.value?.post {
@@ -198,11 +237,11 @@ fun MonthTab() {
             }
         }
 
-        HorizontalDivider(
+        /*HorizontalDivider(
             thickness = 1.dp,
             color = Color.LightGray,
             modifier = Modifier.padding(horizontal = 3.dp)
-        )
+        )*/
 
 
         selectedDate.value?.let { date ->
@@ -219,14 +258,27 @@ fun MonthTab() {
                 )
             } else{
                 Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
                 ){
-                    Card(
+                    Spacer(modifier = Modifier.height(8.dp))
 
+                    Card(
+                        shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFFFFACD)
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally)
+                            .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
                     ){
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(vertical = 12.dp, horizontal = 16.dp),
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                         ) {
@@ -234,7 +286,7 @@ fun MonthTab() {
                             Image(
                                 painter = painterResource(id = record.emojiResID ?: R.drawable.emoji_happy),
                                 contentDescription = null,
-                                modifier = Modifier.size(40.dp)
+                                modifier = Modifier.size(35.dp)
                             )
 
                             Spacer(modifier = Modifier.width(12.dp))
@@ -250,20 +302,35 @@ fun MonthTab() {
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(6.dp))
                     /*HorizontalDivider(
                         thickness = 1.dp,
                         color = Color(0xFFEEEEEE),
                         //modifier = Modifier.padding(vertical = 16.dp)
                     )*/
 
-                    Text(
-                        text = record.detail,
-                        fontFamily = nanumFont1,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Black,
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(start = 25.dp)
-                    )
+                    Card(
+                        shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFF5FFFA)
+                        ), // 요일별 배경색
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally)
+                            .heightIn(min = 120.dp)
+                            .border(2.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
+                    ){
+                        Text(
+                            text = record.detail,
+                            fontFamily = nanumFont1,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Black,
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(top = 15.dp, start = 25.dp, end = 25.dp)
+                        )
+                    }
+
 
                 }
 
