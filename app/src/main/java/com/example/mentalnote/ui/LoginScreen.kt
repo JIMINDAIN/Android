@@ -39,9 +39,8 @@ import com.example.mentalnote.USER_PASSWORD
 import com.example.mentalnote.USER_USERNAME
 import com.example.mentalnote.dataStore
 import com.example.mentalnote.ui.theme.CustomFontFamily
-import kotlinx.coroutines.flow.first
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-import com.google.firebase.auth.FirebaseAuth // FirebaseAuth import 추가
 
 @Composable
 fun LoginScreen(
@@ -99,8 +98,12 @@ fun LoginScreen(
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                colors = TextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
+                    .padding(horizontal = 32.dp)
+                    .background(Color(0xFFFFFDF0), shape = RoundedCornerShape(16.dp)),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
+                )
             )
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -146,7 +149,7 @@ fun LoginScreen(
                     "로그인",
                     fontFamily = CustomFontFamily,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     color = Color.Black
                 )
             }
@@ -166,13 +169,13 @@ fun LoginScreen(
                     pressedElevation = 2.dp,
                     focusedElevation = 3.dp
                 ),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBFE7F2))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFFDF0))
             ) {
                 Text(
                     "회원가입",
                     fontFamily = CustomFontFamily,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Medium,
                     color = Color.Black
                 )
             }

@@ -2,18 +2,16 @@ package com.example.mentalnote
 
 
 //import com.example.mentalnote.ui.FriendScreen
-import android.os.Build
+import android.app.AlarmManager
+import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import android.app.AlarmManager
-import android.provider.Settings
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +34,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.mentalnote.model.DayRecord
@@ -50,11 +50,11 @@ import com.example.mentalnote.ui.WeekTab
 import com.example.mentalnote.ui.loadDayRecords
 import com.example.mentalnote.ui.saveDayRecords
 import com.example.mentalnote.ui.theme.MentalNoteTheme
+import com.example.mentalnote.util.NotificationScheduler
 import com.example.mentalnote.util.loadDummyJsonRecords
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import com.example.mentalnote.util.NotificationScheduler
 
 enum class AuthScreen {
     LOGIN,
@@ -151,7 +151,7 @@ fun MainScreen() {
     LaunchedEffect(Unit){
         val prefs = context.dataStore.data.first()
         val alreadyInitialized = prefs[stringPreferencesKey("init_dummy")] == "true"
-        if (!alreadyInitialized) {
+        /*if (!alreadyInitialized) {
             try {
                 val dummyRecords = loadDummyJsonRecords(context)
                 saveDayRecords(context, dummyRecords)
@@ -173,7 +173,7 @@ fun MainScreen() {
             withContext(Dispatchers.Main) {
                 dayRecords = records.sortedBy { it.date }
             }
-        }
+        }*/
 
         /*if (!alreadyInitialized) {
             val dummyRecords = loadDummyJsonRecords(context)
@@ -188,7 +188,7 @@ fun MainScreen() {
             dayRecords = loadedRecords
         }*/
 
-        /*withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             val dummyRecords = loadDummyJsonRecords(context)
             saveDayRecords(context, dummyRecords)
             context.dataStore.edit {
@@ -198,7 +198,7 @@ fun MainScreen() {
             withContext(Dispatchers.Main) {
                 dayRecords = dummyRecords
             }
-        }*/
+        }
     }
 
     LaunchedEffect(Unit) {
