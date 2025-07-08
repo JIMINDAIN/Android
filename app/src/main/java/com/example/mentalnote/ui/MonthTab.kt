@@ -2,7 +2,6 @@ package com.example.mentalnote.ui
 
 import android.view.View
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -96,11 +94,11 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                         modifier = Modifier
                             .width(180.dp) //
                             .height(32.dp)
-                            .border(
+                            /*.border(
                                 1.dp,
                                 colorResource(id = R.color.y2k_border),
                                 RoundedCornerShape(14.dp)
-                            )
+                            )*/
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -164,13 +162,13 @@ fun MonthTab(dayRecords : List<DayRecord>) {
             Card(
                 shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFFFF8FA)
+                    containerColor = Color(0xFFFFFDF0)
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
-                    .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
+                    //.border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
             ){
                 Column(
                     modifier = Modifier
@@ -285,13 +283,13 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                     Card(
                         shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFFFDF0)
+                            containerColor = Color(0xFFFFF8FA)
                         ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.CenterHorizontally)
-                            .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
+                            //.border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
                     ){
                         Row(
                             modifier = Modifier
@@ -320,7 +318,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     /*HorizontalDivider(
                         thickness = 1.dp,
                         color = Color(0xFFEEEEEE),
@@ -337,7 +335,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                             .fillMaxWidth()
                             .align(Alignment.CenterHorizontally)
                             .heightIn(min = 120.dp)
-                            .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
+                            //.border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
                     ){
                         Text(
                             text = record.detail,

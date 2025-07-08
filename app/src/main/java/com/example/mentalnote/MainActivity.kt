@@ -3,6 +3,7 @@ package com.example.mentalnote
 
 //import com.example.mentalnote.ui.FriendScreen
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -110,6 +111,12 @@ fun MainScreen() {
         val loadedRecords = loadDayRecords(context)
         dayRecords = loadedRecords
     }
+    LaunchedEffect(Unit) {
+        val all = loadDayRecords(context)
+        all.forEach {
+            Log.d("RECORD_DEBUG", "날짜: ${it.date}, emoji: ${it.emojiResID}")
+        }
+    }
 
     // Update currentMainScreenState based on selectedTab
     LaunchedEffect(selectedTab) {
@@ -126,6 +133,7 @@ fun MainScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
+
     ) {
         Scaffold(
             containerColor = Color.Transparent,
@@ -140,7 +148,7 @@ fun MainScreen() {
                                 Image(
                                     painter = painterResource(id = tabIcons[index]),
                                     contentDescription = title,
-                                    modifier = Modifier.size(50.dp)
+                                    modifier = Modifier.size(56.dp)
                                         .padding(top = 2.dp)
                                 )
                                    },
