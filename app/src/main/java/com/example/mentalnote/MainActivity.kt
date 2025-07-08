@@ -36,6 +36,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.mentalnote.model.DayRecord
 import com.example.mentalnote.ui.AddFriendScreen
 import com.example.mentalnote.ui.FriendRequestListScreen
@@ -46,8 +48,12 @@ import com.example.mentalnote.ui.ProfileScreen
 import com.example.mentalnote.ui.RegistrationScreen
 import com.example.mentalnote.ui.WeekTab
 import com.example.mentalnote.ui.loadDayRecords
+import com.example.mentalnote.ui.saveDayRecords
 import com.example.mentalnote.ui.theme.MentalNoteTheme
+import com.example.mentalnote.util.loadDummyJsonRecords
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import com.example.mentalnote.util.NotificationScheduler
 
 enum class AuthScreen {
@@ -143,9 +149,58 @@ fun MainScreen() {
     val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
 
     LaunchedEffect(Unit){
-        val loadedRecords = loadDayRecords(context)
-        dayRecords = loadedRecords
+        val prefs = context.dataStore.data.first()
+        val alreadyInitialized = prefs[stringPreferencesKey("init_dummy")] == "true"
+        if (!alreadyInitialized) {
+            try {
+                val dummyRecords = loadDummyJsonRecords(context)
+                saveDayRecords(context, dummyRecords)
+                context.dataStore.edit {
+                    it[stringPreferencesKey("init_dummy")] = "true"
+                }
+                Log.d("DUMMY", "초기 더미 데이터 저장 완료")
+                withContext(Dispatchers.Main) {
+                    dayRecords = dummyRecords.sortedBy { it.date }
+                }
+            } catch (e: Exception) {
+                Log.e("DUMMY", "더미 데이터 로딩 실패: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    dayRecords = emptyList()
+                }
+            }
+        } else {
+            val records = loadDayRecords(context)
+            withContext(Dispatchers.Main) {
+                dayRecords = records.sortedBy { it.date }
+            }
+        }
+
+        /*if (!alreadyInitialized) {
+            val dummyRecords = loadDummyJsonRecords(context)
+            saveDayRecords(context, dummyRecords)
+            dayRecords = dummyRecords
+            context.dataStore.edit {
+                it[stringPreferencesKey("init_dummy")] = "true"
+            }
+            Log.d("DUMMY", "초기 더미 데이터 저장 완료")
+        } else {
+            val loadedRecords = loadDayRecords(context)
+            dayRecords = loadedRecords
+        }*/
+
+        /*withContext(Dispatchers.IO) {
+            val dummyRecords = loadDummyJsonRecords(context)
+            saveDayRecords(context, dummyRecords)
+            context.dataStore.edit {
+                it[stringPreferencesKey("init_dummy")] = "ignored"
+            }
+            Log.d("DUMMY", "더미 데이터 강제 저장 완료")
+            withContext(Dispatchers.Main) {
+                dayRecords = dummyRecords
+            }
+        }*/
     }
+
     LaunchedEffect(Unit) {
         val all = loadDayRecords(context)
         all.forEach {

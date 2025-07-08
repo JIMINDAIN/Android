@@ -20,8 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.mentalnote.model.DayRecord
@@ -40,6 +42,7 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
         val photoRecords = remember(dayRecords) {
             dayRecords.filter { it.imageUri != null || it.imageBitmap != null }
                 .sortedByDescending { it.date }
+                //.reversed()
         }
 
         if (photoRecords.isEmpty()) {
@@ -57,10 +60,10 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
             ) {
                 items(photoRecords.size) { index ->
                     val record = photoRecords[index]
-
                     Box(
                         modifier = Modifier
                             .aspectRatio(1f)
+                            .clip(RoundedCornerShape(8.dp))
                             .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
                     ) {
                         when {
@@ -68,7 +71,8 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
                                 Image(
                                     bitmap = record.imageBitmap,
                                     contentDescription = null,
-                                    modifier = Modifier.fillMaxSize()
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
                                 )
                             }
                             record.imageUri != null -> {
@@ -82,7 +86,8 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
                                     Image(
                                         bitmap = it.asImageBitmap(),
                                         contentDescription = null,
-                                        modifier = Modifier.fillMaxSize()
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
                                     )
                                 }
                             }
