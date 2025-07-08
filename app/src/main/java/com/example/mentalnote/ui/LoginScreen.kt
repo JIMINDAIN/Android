@@ -16,26 +16,21 @@ import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.ButtonDefaults
-import androidx.datastore.preferences.core.booleanPreferencesKey
+import com.example.mentalnote.IS_LOGGED_IN
+import com.example.mentalnote.R
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.example.mentalnote.dataStore
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import com.example.mentalnote.R
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import com.example.mentalnote.ui.theme.CustomFontFamily
-import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.foundation.border
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.ui.res.colorResource
-
-val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import com.example.mentalnote.ui.theme.CustomFontFamily
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit) {

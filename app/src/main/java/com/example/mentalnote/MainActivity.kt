@@ -37,7 +37,7 @@ import com.kakao.sdk.common.KakaoSdk
 import com.example.mentalnote.ui.LoginScreen
 import com.example.mentalnote.ui.FriendScreen // Import FriendScreen
 import com.example.mentalnote.dataStore
-import com.example.mentalnote.ui.IS_LOGGED_IN
+import com.example.mentalnote.IS_LOGGED_IN
 import kotlinx.coroutines.flow.first
 
 
