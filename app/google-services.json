@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "6192981360",
+    "project_id": "mentalnote-2bfd0",
+    "storage_bucket": "mentalnote-2bfd0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6192981360:android:d799d078838485cb951bb5",
+        "android_client_info": {
+          "package_name": "com.example.mentalnote"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW8DpRqzOvhuZlj6DuC5x1kw9SPvxOfKI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlinx.serialization)
     id("org.jetbrains.kotlin.kapt")
+    id("com.google.gms.google-services") // Google Services 플러그인 추가
 }
 
 android {
@@ -52,7 +53,7 @@ dependencies {
     // 중복 제거: kotlinx-serialization-json 버전 하나만 남기기
     // implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0") 제거
 
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -80,5 +81,9 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
+
+    // Firebase BoM 및 Authentication 라이브러리 추가
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.firebase:firebase-auth-ktx")
 
     }

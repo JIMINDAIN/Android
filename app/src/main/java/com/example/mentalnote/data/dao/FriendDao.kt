@@ -12,11 +12,8 @@ interface FriendDao {
     suspend fun insertFriend(friend: Friend)
 
     @Query("SELECT * FROM friends WHERE userId = :userId")
-    suspend fun getFriendsForUser(userId: String): List<Friend>
-
-    @Query("DELETE FROM friends WHERE userId = :userId AND friendUserId = :friendUserId")
-    suspend fun deleteFriend(userId: String, friendUserId: String)
+    suspend fun getFriendsForUser(userId: Int): List<Friend>
 
     @Query("SELECT * FROM friends WHERE userId = :userId AND friendUserId = :friendUserId")
-    suspend fun getFriend(userId: String, friendUserId: String): Friend?
+    suspend fun getFriendship(userId: Int, friendUserId: Int): Friend?
 }

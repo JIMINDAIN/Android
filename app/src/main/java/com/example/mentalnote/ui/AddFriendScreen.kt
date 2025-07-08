@@ -131,7 +131,7 @@ fun AddFriendScreen(onBack: () -> Unit) {
                         }
 
                         // 2. 이미 친구인지 확인
-                        val existingFriend = friendDao.getFriend(currentUserId.value, targetUser.id)
+                        val existingFriend = friendDao.getFriendship(currentUserId.value, targetUser.id)
                         if (existingFriend != null) {
                             Toast.makeText(context, "이미 친구로 추가된 사용자입니다.", Toast.LENGTH_SHORT).show()
                             return@launch
