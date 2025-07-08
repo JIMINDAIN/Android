@@ -1,6 +1,7 @@
 package com.example.mentalnote
 
 
+//import com.example.mentalnote.ui.FriendScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,21 +29,16 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.example.mentalnote.model.DayRecord
-import com.example.mentalnote.ui.FriendScreen
+import com.example.mentalnote.ui.AddFriendScreen
+import com.example.mentalnote.ui.FriendRequestListScreen
 import com.example.mentalnote.ui.GalleryTab
 import com.example.mentalnote.ui.LoginScreen
 import com.example.mentalnote.ui.MonthTab
+import com.example.mentalnote.ui.ProfileScreen
+import com.example.mentalnote.ui.RegistrationScreen
 import com.example.mentalnote.ui.WeekTab
 import com.example.mentalnote.ui.loadDayRecords
 import com.example.mentalnote.ui.theme.MentalNoteTheme
-import com.kakao.sdk.common.KakaoSdk
-import com.example.mentalnote.ui.LoginScreen
-import com.example.mentalnote.ui.ProfileScreen
-import com.example.mentalnote.ui.RegistrationScreen
-import com.example.mentalnote.ui.AddFriendScreen // AddFriendScreen import
-import com.example.mentalnote.ui.FriendRequestListScreen // FriendRequestListScreen import
-import com.example.mentalnote.dataStore
-import com.example.mentalnote.IS_LOGGED_IN
 import kotlinx.coroutines.flow.first
 
 enum class AuthScreen {
