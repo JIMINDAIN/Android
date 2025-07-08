@@ -3,7 +3,6 @@ package com.example.mentalnote.ui
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
@@ -456,7 +455,7 @@ fun DayDetailDialog(
                         placeholder = { Text("한 줄 요약...", fontFamily = CustomFontFamily, color = Color.Gray) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp)
+                            .height(55.dp)
                             .shadow(4.dp, RoundedCornerShape(8.dp), clip = false)
                             .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(8.dp)),
                         colors = TextFieldDefaults.colors(
