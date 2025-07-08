@@ -90,7 +90,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                     Card(
                         shape = RoundedCornerShape(14.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFFF8FA)
+                            containerColor = Color(0xFFFFFDF0)
                         ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                         modifier = Modifier
@@ -254,6 +254,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
             }
         }
 
+        Spacer(modifier = Modifier.height(4.dp))
         /*HorizontalDivider(
             thickness = 1.dp,
             color = Color.LightGray,

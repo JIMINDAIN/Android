@@ -2,35 +2,42 @@ package com.example.mentalnote.ui
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.edit
+import com.example.mentalnote.IS_LOGGED_IN
+import com.example.mentalnote.R
+import com.example.mentalnote.dataStore
+import com.example.mentalnote.ui.theme.CustomFontFamily
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import androidx.compose.ui.graphics.Color
-import androidx.compose.material3.ButtonDefaults
-import com.example.mentalnote.IS_LOGGED_IN
-import com.example.mentalnote.R
-import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.example.mentalnote.dataStore
-import androidx.compose.foundation.background
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
-import com.example.mentalnote.ui.theme.CustomFontFamily
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit) {
@@ -106,7 +113,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp)
                     .height(56.dp) // 버튼 높이 증가
-                    .border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)), // 각진 테두리
+                    .border(1.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)), // 각진 테두리
                 shape = CutCornerShape(12.dp), // 각진 모서리
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFEE500)) // Kakao yellow
             ) {
