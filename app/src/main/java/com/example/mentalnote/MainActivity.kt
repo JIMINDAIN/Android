@@ -40,6 +40,7 @@ import com.example.mentalnote.ui.RegistrationScreen
 import com.example.mentalnote.ui.WeekTab
 import com.example.mentalnote.ui.loadDayRecords
 import com.example.mentalnote.ui.theme.MentalNoteTheme
+import com.example.mentalnote.util.loadDummyDataIfNeeded
 import kotlinx.coroutines.flow.first
 
 enum class AuthScreen {
@@ -69,6 +70,8 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     val prefs = context.dataStore.data.first()
                     isLoggedIn = prefs[IS_LOGGED_IN] ?: false
+
+                    loadDummyDataIfNeeded(context)
                 }
 
                 if (isLoggedIn) {
