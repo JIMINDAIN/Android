@@ -260,9 +260,6 @@ fun WeekRow(
         DayOfWeek.SUNDAY -> Color(0xFFF5FFFA) // LavenderBlush
     }
 
-
-
-
     Box(
         modifier = Modifier
             .fillMaxWidth()

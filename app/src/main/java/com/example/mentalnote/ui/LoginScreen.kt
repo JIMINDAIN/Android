@@ -2,7 +2,6 @@ package com.example.mentalnote.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -65,7 +64,7 @@ fun LoginScreen(
         ) {
             // 앱 로고/타이틀
             Text(
-                text = "MENTAL NOTE",
+                text = "MINDNOTE",
                 fontFamily = CustomFontFamily,
                 fontSize = 48.sp,
                 fontWeight = FontWeight.ExtraBold,
@@ -123,10 +122,15 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp)
-                    .height(56.dp)
-                    .border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
-                shape = CutCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFEE500))
+                    .height(52.dp),
+                //.border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
+                shape = RoundedCornerShape(16.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 3.dp,
+                    pressedElevation = 2.dp,
+                    focusedElevation = 3.dp
+                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFF0F5))
             ) {
                 Text(
                     "로그인",
@@ -144,10 +148,15 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp)
-                    .height(56.dp)
-                    .border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
-                shape = CutCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFADD8E6))
+                    .height(52.dp),
+                    //.border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
+                shape = RoundedCornerShape(16.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 3.dp,
+                    pressedElevation = 2.dp,
+                    focusedElevation = 3.dp
+                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBFE7F2))
             ) {
                 Text(
                     "회원가입",
