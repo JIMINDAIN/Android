@@ -88,7 +88,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                     contentAlignment = Alignment.Center
                 ) {
                     Card(
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(14.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFFFFF8FA)
                         ),
@@ -99,7 +99,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                             .border(
                                 1.dp,
                                 colorResource(id = R.color.y2k_border),
-                                RoundedCornerShape(16.dp)
+                                RoundedCornerShape(14.dp)
                             )
                     ) {
                         Box(
