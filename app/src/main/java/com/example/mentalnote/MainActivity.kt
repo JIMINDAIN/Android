@@ -36,19 +36,37 @@ import com.example.mentalnote.ui.WeekTab
 import com.example.mentalnote.ui.loadDayRecords
 import com.example.mentalnote.ui.theme.MentalNoteTheme
 import com.kakao.sdk.common.KakaoSdk
+import com.example.mentalnote.ui.LoginScreen
+import com.example.mentalnote.ui.ProfileScreen
+import com.example.mentalnote.ui.RegistrationScreen
+import com.example.mentalnote.ui.AddFriendScreen // AddFriendScreen import
+import com.example.mentalnote.ui.FriendRequestListScreen // FriendRequestListScreen import
+import com.example.mentalnote.dataStore
+import com.example.mentalnote.IS_LOGGED_IN
 import kotlinx.coroutines.flow.first
 
+enum class AuthScreen {
+    LOGIN,
+    REGISTER
+}
+
+enum class MainScreenState {
+    WEEK,
+    GALLERY,
+    MONTH,
+    PROFILE,
+    ADDFRIEND,
+    FRIEND_REQUESTS
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Kakao SDK 초기화
-        KakaoSdk.init(this, "ca0464f0ff97bd6b8e9f02ea1b41734f")
-
         setContent {
             MentalNoteTheme {
                 var isLoggedIn by remember { mutableStateOf(false) }
+                var currentAuthScreen by remember { mutableStateOf(AuthScreen.LOGIN) }
                 val context = LocalContext.current
 
                 LaunchedEffect(Unit) {
@@ -59,7 +77,16 @@ class MainActivity : ComponentActivity() {
                 if (isLoggedIn) {
                     MainScreen()
                 } else {
-                    LoginScreen(onLoginSuccess = { isLoggedIn = true })
+                    when (currentAuthScreen) {
+                        AuthScreen.LOGIN -> LoginScreen(
+                            onLoginSuccess = { isLoggedIn = true },
+                            onRegisterClick = { currentAuthScreen = AuthScreen.REGISTER }
+                        )
+                        AuthScreen.REGISTER -> RegistrationScreen(
+                            onRegistrationSuccess = { isLoggedIn = true },
+                            onBackToLogin = { currentAuthScreen = AuthScreen.LOGIN }
+                        )
+                    }
                 }
             }
         }
@@ -69,13 +96,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Week", "Gallery", "Month", "Friend") // Add Friend tab
+    val tabs = listOf("Week", "Gallery", "Month", "Profile") // Add Friend tab
     val tabIcons = listOf(
         R.drawable.week_bottombar,
         R.drawable.gallery_bottombar,
         R.drawable.month_bottombar,
         R.drawable.friend_bottombar
     )
+    var currentMainScreenState by remember { mutableStateOf(MainScreenState.WEEK) }
 
     val context = LocalContext.current
     var dayRecords by remember { mutableStateOf(listOf<DayRecord>()) }
@@ -86,6 +114,18 @@ fun MainScreen() {
         val loadedRecords = loadDayRecords(context)
         dayRecords = loadedRecords
     }
+
+    // Update currentMainScreenState based on selectedTab
+    LaunchedEffect(selectedTab) {
+        currentMainScreenState = when (selectedTab) {
+            0 -> MainScreenState.WEEK
+            1 -> MainScreenState.GALLERY
+            2 -> MainScreenState.MONTH
+            3 -> MainScreenState.PROFILE
+            else -> MainScreenState.WEEK // Default case
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -127,8 +167,8 @@ fun MainScreen() {
                     .fillMaxSize(),
                 color = Color.Transparent
             ) {
-                when (selectedTab) {
-                    0 -> WeekTab(
+                when (currentMainScreenState) {
+                    MainScreenState.WEEK -> WeekTab(
                         dayRecords = dayRecords,
                         onSave = { record ->
                             dayRecords = dayRecords.toMutableList().also { list ->
@@ -137,10 +177,14 @@ fun MainScreen() {
                             }
                         }
                     )
-                    //1 -> Tab2Screen() // 혹은
-                    1 -> GalleryTab(dayRecords = dayRecords)
-                    2 -> MonthTab(dayRecords = dayRecords)
-                    3 -> FriendScreen() // Display FriendScreen for the new tab
+                    MainScreenState.GALLERY -> GalleryTab(dayRecords = dayRecords)
+                    MainScreenState.MONTH -> MonthTab(dayRecords = dayRecords)
+                    MainScreenState.PROFILE -> ProfileScreen(
+                        onAddFriendClick = { currentMainScreenState = MainScreenState.ADDFRIEND },
+                        onFriendRequestListClick = { currentMainScreenState = MainScreenState.FRIEND_REQUESTS }
+                    )
+                    MainScreenState.ADDFRIEND -> AddFriendScreen(onBack = { currentMainScreenState = MainScreenState.PROFILE })
+                    MainScreenState.FRIEND_REQUESTS -> FriendRequestListScreen(onBack = { currentMainScreenState = MainScreenState.PROFILE })
                 }
             }
         }

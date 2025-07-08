@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.content.Intent
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -73,11 +74,21 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
+import com.example.mentalnote.util.UriSerializer
+
 val DAY_RECORDS_KEY = stringPreferencesKey("day_records")
 val LAST_RESET_DATE_KEY = stringPreferencesKey("last_reset_date")
 
+val json = Json {
+    serializersModule = SerializersModule {
+        contextual(UriSerializer)
+    }
+}
+
 suspend fun saveDayRecords(context: Context, records: List<DayRecord>) {
-    val json = Json.encodeToString(records)
+    val json = json.encodeToString(records)
     context.dataStore.edit { prefs ->
         prefs[DAY_RECORDS_KEY] = json
     }
@@ -86,12 +97,12 @@ suspend fun saveDayRecords(context: Context, records: List<DayRecord>) {
 suspend fun loadDayRecords(context: Context): List<DayRecord> {
     Log.d("loadDayRecords", "불러오기 시작")
     val prefs = context.dataStore.data.first()
-    val json = prefs[DAY_RECORDS_KEY]
-    return if (json == null) {
+    val jsonString = prefs[DAY_RECORDS_KEY]
+    return if (jsonString == null) {
         emptyList()
     } else {
         try {
-            Json.decodeFromString(json)
+            json.decodeFromString(jsonString)
         } catch (e: Exception) {
             emptyList()
         }
@@ -201,7 +212,7 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
                     emojiResID = emojiResID,
                     summary = summary,
                     detail = detail,
-                    imageUriString = imageUri?.toString(),
+                    imageUri = imageUri,
                     imageBitmap = imageBitmap
                 )
                 weekRecords = weekRecords.toMutableList().also { list ->
@@ -382,6 +393,8 @@ fun DayDetailDialog(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success && photoUri.value != null) {
+            val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(photoUri.value!!, flag)
             imageUri = photoUri.value
             cameraBitmap = null
         }

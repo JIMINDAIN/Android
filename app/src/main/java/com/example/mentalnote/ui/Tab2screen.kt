@@ -37,7 +37,7 @@ fun Tab2Screen() {
             },
             summary = "샘플 요약 $index",
             detail = "샘플 상세 내용 $index",
-            imageUriString = null,
+            imageUri = null,
             imageBitmap = createSampleBitmap()
         )
     }
