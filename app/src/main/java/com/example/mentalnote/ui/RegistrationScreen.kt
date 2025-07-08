@@ -1,5 +1,6 @@
 package com.example.mentalnote.ui
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -13,21 +14,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mentalnote.R
-import com.example.mentalnote.ui.theme.CustomFontFamily
-import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
 import androidx.datastore.preferences.core.edit
-import kotlinx.coroutines.launch
-import com.example.mentalnote.dataStore
-import com.example.mentalnote.USER_USERNAME
-import com.example.mentalnote.USER_PASSWORD
 import com.example.mentalnote.IS_LOGGED_IN
+import com.example.mentalnote.R
+import com.example.mentalnote.USER_PASSWORD
+import com.example.mentalnote.USER_USERNAME
+import com.example.mentalnote.dataStore
+import com.example.mentalnote.ui.theme.CustomFontFamily
+import com.google.firebase.auth.ActionCodeSettings
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import android.util.Log
 
 @Composable
 fun RegistrationScreen(
@@ -36,14 +41,15 @@ fun RegistrationScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val auth = FirebaseAuth.getInstance()
 
-    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(color = Color(0xFFADD8E6)) // Y2K 느낌의 푸른색 배경
+        .background(color = Color(0xFFADD8E6))
     ) {
         Column(
             modifier = Modifier
@@ -62,9 +68,9 @@ fun RegistrationScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             TextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("사용자 이름") },
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("이메일 주소") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
@@ -95,20 +101,27 @@ fun RegistrationScreen(
 
             Button(
                 onClick = {
-                    if (username.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
-                        Toast.makeText(context, "모든 필드를 채워주세요.", Toast.LENGTH_SHORT).show()
+                    if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+                        Toast.makeText(context, "모든 필드를 입력해주세요.", Toast.LENGTH_SHORT).show()
                     } else if (password != confirmPassword) {
                         Toast.makeText(context, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
                     } else {
-                        coroutineScope.launch {
-                            context.dataStore.edit { prefs ->
-                                prefs[USER_USERNAME] = username
-                                prefs[USER_PASSWORD] = password // 실제 앱에서는 비밀번호를 해싱하여 저장해야 합니다.
-                                prefs[IS_LOGGED_IN] = true // 회원가입 성공 시 바로 로그인 상태로 전환
+                        auth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    coroutineScope.launch {
+                                        context.dataStore.edit { prefs ->
+                                            prefs[USER_USERNAME] = email
+                                            prefs[USER_PASSWORD] = password // 실제 앱에서는 비밀번호를 해싱하여 저장해야 합니다.
+                                            prefs[IS_LOGGED_IN] = true
+                                        }
+                                    }
+                                    Toast.makeText(context, "회원가입 성공!", Toast.LENGTH_SHORT).show()
+                                    onRegistrationSuccess()
+                                } else {
+                                    Toast.makeText(context, "회원가입 실패: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                                }
                             }
-                            Toast.makeText(context, "회원가입 성공!", Toast.LENGTH_SHORT).show()
-                            onRegistrationSuccess()
-                        }
                     }
                 },
                 modifier = Modifier
@@ -119,7 +132,7 @@ fun RegistrationScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFEE500))
             ) {
                 Text(
-                    "회원가입",
+                    "회원가입 완료",
                     fontFamily = CustomFontFamily,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,

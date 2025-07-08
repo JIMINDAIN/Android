@@ -42,6 +42,7 @@ import com.example.mentalnote.dataStore
 import com.example.mentalnote.ui.theme.CustomFontFamily
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth // FirebaseAuth import 추가
 
 @Composable
 fun LoginScreen(
@@ -50,6 +51,7 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val auth = FirebaseAuth.getInstance() // FirebaseAuth 인스턴스 가져오기
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -106,18 +108,26 @@ fun LoginScreen(
             // 로그인 버튼
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        val prefs = context.dataStore.data.first()
-                        val storedUsername = prefs[USER_USERNAME]
-                        val storedPassword = prefs[USER_PASSWORD]
-
-                        if (username == storedUsername && password == storedPassword) {
-                            context.dataStore.edit { it[IS_LOGGED_IN] = true }
-                            Toast.makeText(context, "로그인 성공!", Toast.LENGTH_SHORT).show()
-                            onLoginSuccess()
-                        } else {
-                            Toast.makeText(context, "사용자 이름 또는 비밀번호가 올바르지 않습니다.", Toast.LENGTH_SHORT).show()
-                        }
+                    if (username.isBlank() || password.isBlank()) {
+                        Toast.makeText(context, "사용자 이름과 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        auth.signInWithEmailAndPassword(username, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    coroutineScope.launch {
+                                        context.dataStore.edit { prefs ->
+                                            prefs[IS_LOGGED_IN] = true
+                                            // 로그인 성공 시 사용자 이름과 비밀번호를 DataStore에 저장 (선택 사항)
+                                            prefs[USER_USERNAME] = username
+                                            prefs[USER_PASSWORD] = password
+                                        }
+                                    }
+                                    Toast.makeText(context, "로그인 성공!", Toast.LENGTH_SHORT).show()
+                                    onLoginSuccess()
+                                } else {
+                                    Toast.makeText(context, "로그인 실패: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                                }
+                            }
                     }
                 },
                 modifier = Modifier

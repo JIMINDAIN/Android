@@ -393,8 +393,6 @@ fun DayDetailDialog(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success && photoUri.value != null) {
-            val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            context.contentResolver.takePersistableUriPermission(photoUri.value!!, flag)
             imageUri = photoUri.value
             cameraBitmap = null
         }
