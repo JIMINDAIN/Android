@@ -3,10 +3,9 @@ package com.example.mentalnote.data.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "friends")
+@Entity(tableName = "friends", primaryKeys = ["userId", "friendUserId"])
 data class Friend(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val userId: Int,
-    val friendUserId: Int,
+    val userId: String,
+    val friendUserId: String,
     val friendUsername: String
 )

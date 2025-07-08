@@ -3,11 +3,10 @@ package com.example.mentalnote.data.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "friend_requests")
+@Entity(tableName = "friend_requests", primaryKeys = ["senderUserId", "receiverUserId"])
 data class FriendRequest(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val senderUserId: Int,
-    val receiverUserId: Int,
+    val senderUserId: String,
+    val receiverUserId: String,
     val senderUsername: String,
     val receiverUsername: String
 )
