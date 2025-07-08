@@ -1,5 +1,6 @@
 package com.example.mentalnote.model
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
@@ -22,12 +23,8 @@ data class DayRecord(
     val emojiResID: Int? = null,
     val summary: String = "",
     val detail: String = "",
-    val imageUriString: String ?= null,
+    @Contextual val imageUri: Uri? = null,
 
     @Transient
     val imageBitmap: ImageBitmap? = null
 )
-{
-    @Transient
-    val imageUri: Uri? = imageUriString?.let{ Uri.parse(it) }
-}
