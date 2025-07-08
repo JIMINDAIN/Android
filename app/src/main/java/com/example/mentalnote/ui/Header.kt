@@ -38,7 +38,7 @@ fun AppHeader() {
         Text(
             text = "mindnote",
             fontFamily = nanumFont1,
-            fontSize = 23.sp,
+            fontSize = 25.sp,
             color = Color(0xFF6B4D47) // 갈색
         )
     }
