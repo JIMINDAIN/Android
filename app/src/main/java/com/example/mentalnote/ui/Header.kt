@@ -28,9 +28,9 @@ fun AppHeader() {
         Spacer(modifier = Modifier.width(5.dp))
 
         Image(
-            painter = painterResource(id = R.drawable.mindnote_logo),
+            painter = painterResource(id = R.drawable.mindnote_logo_no_logo),
             contentDescription = "App Logo",
-            modifier = Modifier.size(35.dp)
+            modifier = Modifier.size(30.dp)
         )
 
         Spacer(modifier = Modifier.width(15.dp))
