@@ -180,9 +180,9 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
                     text = "오늘의 기분을 입력하세요!",
 
                     fontFamily = CustomFontFamily,
-                    fontSize = 20.sp, // 폰트 크기
+                    fontSize = 19.sp, // 폰트 크기
                     fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.y2k_text),
+                    color = Color.DarkGray,
                     lineHeight = 30.sp // 행간 간격 높임
                 )
             }
@@ -310,9 +310,9 @@ fun WeekRow(
                                     )
                                 ),
                                 fontFamily = CustomFontFamily,
-                                fontSize = 26.sp,
-                                color = colorResource(id = R.color.y2k_text),
-                                fontWeight = FontWeight.Bold
+                                fontSize = 28.sp,
+                                color = Color(0xFF333333),
+                                fontWeight = FontWeight.W600
                             )
                             Spacer(modifier = Modifier.height(4.dp))
 

@@ -3,14 +3,29 @@ package com.example.mentalnote.ui
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,12 +35,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mentalnote.R
-import com.example.mentalnote.ui.theme.CustomFontFamily
+import com.example.mentalnote.USER_USERNAME
 import com.example.mentalnote.data.database.AppDatabase
 import com.example.mentalnote.data.model.Friend
 import com.example.mentalnote.data.model.FriendRequest
 import com.example.mentalnote.dataStore
-import com.example.mentalnote.USER_USERNAME
+import com.example.mentalnote.ui.theme.CustomFontFamily
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -53,7 +68,7 @@ fun FriendRequestListScreen(onBack: () -> Unit) {
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(color = Color(0xFFADD8E6))
+        //.background(color = Color(0xFFADD8E6))
     ) {
         Column(
             modifier = Modifier
@@ -66,17 +81,18 @@ fun FriendRequestListScreen(onBack: () -> Unit) {
                 text = "친구 요청 목록",
                 fontFamily = CustomFontFamily,
                 fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = colorResource(id = R.color.y2k_primary)
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF333333)
+                //color = colorResource(id = R.color.y2k_primary)
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(45.dp))
 
             if (friendRequests.isEmpty()) {
                 Text(
-                    text = "받은 친구 요청이 없습니다.",
+                    text = " 받은 친구 요청이 없습니다.",
                     fontFamily = CustomFontFamily,
                     fontSize = 18.sp,
-                    color = Color.Black
+                    color = Color.DarkGray
                 )
             } else {
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
@@ -126,17 +142,23 @@ fun FriendRequestListScreen(onBack: () -> Unit) {
                 onClick = onBack,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
-                shape = CutCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFADD8E6))
+                    .height(52.dp),
+                shape = RoundedCornerShape(16.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 4.dp,
+                    pressedElevation = 2.dp,
+                    focusedElevation = 4.dp
+                ),
+                    //.border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
+                    //.shape = CutCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBFE7F2))//
             ) {
                 Text(
                     "뒤로 가기",
                     fontFamily = CustomFontFamily,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color(0xFF333333)
                 )
             }
         }

@@ -67,8 +67,8 @@ fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> 
                 text = "내 프로필",
                 fontFamily = CustomFontFamily,
                 fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(id = R.color.y2k_primary),
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF333333),
                 modifier = Modifier.padding(bottom = 20.dp)
             )
 
@@ -114,7 +114,7 @@ fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> 
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Friend Management Section
             Card(
@@ -134,7 +134,7 @@ fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> 
                     Text(
                         text = "내 친구 목록",
                         fontFamily = CustomFontFamily,
-                        fontSize = 24.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         color = colorResource(id = R.color.y2k_text),
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -144,7 +144,7 @@ fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> 
                         Text(
                             text = "아직 친구가 없습니다.",
                             fontFamily = CustomFontFamily,
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
                             color = colorResource(id = R.color.y2k_text),
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
@@ -178,7 +178,7 @@ fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> 
                         onClick = onAddFriendClick,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
+                            .height(52.dp),
                             //.border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
                         shape = RoundedCornerShape(16.dp),
                         elevation = ButtonDefaults.buttonElevation(
@@ -193,7 +193,7 @@ fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> 
                             fontFamily = CustomFontFamily,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            color = Color(0xFF3333333)
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -201,7 +201,7 @@ fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> 
                         onClick = onFriendRequestListClick,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
+                            .height(52.dp),
                             //.border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
                         //shape = CutCornerShape(12.dp),
                         shape = RoundedCornerShape(16.dp),
@@ -216,8 +216,8 @@ fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> 
                             "친구 요청 목록",
                             fontFamily = CustomFontFamily,
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF333333)
                         )
                     }
                 }
