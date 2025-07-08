@@ -60,8 +60,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("com.google.android.material:material:1.8.0")
-    implementation ("com.google.accompanist:accompanist-permissions:0.30.1")
-
+    implementation("com.google.accompanist:accompanist-permissions:0.30.1")
+    implementation("com.kakao.sdk:v2-user:2.19.0")
     // 중복 제거: Compose material3, ui, ui-tooling-preview 버전 일치 확인하고 libs에 등록하는게 좋음
     // implementation ("androidx.compose.material3:material3:1.1.0")
     // implementation ("androidx.compose.ui:ui:1.4.3")
@@ -75,4 +75,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.calendarView)
-}
+
+    }

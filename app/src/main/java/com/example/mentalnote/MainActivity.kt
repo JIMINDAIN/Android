@@ -32,12 +32,37 @@ import androidx.compose.runtime.LaunchedEffect
 import com.example.mentalnote.ui.loadDayRecords
 
 
+import com.example.mentalnote.ui.loadDayRecords
+import com.kakao.sdk.common.KakaoSdk
+import com.example.mentalnote.ui.LoginScreen
+import com.example.mentalnote.ui.FriendScreen // Import FriendScreen
+import com.example.mentalnote.dataStore
+import com.example.mentalnote.ui.IS_LOGGED_IN
+import kotlinx.coroutines.flow.first
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Kakao SDK 초기화
+        KakaoSdk.init(this, "ca0464f0ff97bd6b8e9f02ea1b41734f")
+
         setContent {
             MentalNoteTheme {
-                MainScreen()
+                var isLoggedIn by remember { mutableStateOf(false) }
+                val context = LocalContext.current
+
+                LaunchedEffect(Unit) {
+                    val prefs = context.dataStore.data.first()
+                    isLoggedIn = prefs[IS_LOGGED_IN] ?: false
+                }
+
+                if (isLoggedIn) {
+                    MainScreen()
+                } else {
+                    LoginScreen(onLoginSuccess = { isLoggedIn = true })
+                }
             }
         }
     }
@@ -46,7 +71,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Week", "Gallery", "Month")
+    val tabs = listOf("Week", "Gallery", "Month", "Friend") // Add Friend tab
 
     val context = LocalContext.current
     var dayRecords by remember { mutableStateOf(listOf<DayRecord>()) }
@@ -100,6 +125,7 @@ fun MainScreen() {
                     )
                     1 -> Tab2Screen() // 혹은 GalleryTab(dayRecords = dayRecords)
                     2 -> MonthTab(dayRecords = dayRecords)
+                    3 -> FriendScreen() // Display FriendScreen for the new tab
                 }
             }
         }
