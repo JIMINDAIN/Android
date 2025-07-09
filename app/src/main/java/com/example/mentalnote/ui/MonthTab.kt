@@ -2,6 +2,8 @@ package com.example.mentalnote.ui
 
 import android.view.View
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,8 +58,6 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 
 
 val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
@@ -276,10 +276,10 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                 Text(
                     text = "기록이 없습니다.",
                     fontFamily = nanumFont1,
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier.padding(22.dp),
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.LightGray,
-                    fontSize = 20.sp
+                    fontSize = 16.sp
                 )
             } else{
                 Column(
