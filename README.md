@@ -47,6 +47,7 @@
 - 로그인 실패 → “사용자 이름 혹은 비밀번호가 일치하지 않습니다”
 
 ### ✅ Tab 1 : Week page
+![메인 화면](./images/week_page.png)
 
 ⭐ **앱의 메인 화면 (좌)**
 
@@ -76,11 +77,13 @@
 
 > WeekTab에서 사용자가 찍거나 선택한 사진들을 날짜 기준으로 정렬하여 격자 형태로 보여주는 페이지
 > 
+![갤러리 화면](./images/gallery_page.png)
 
 ### ✅ Tab 3 : Month page
 
 > 사용자의 감정 변화를 한 달 단위로 시각적으로 확인할 수 있는 페이지
 > 
+![month_page](./images/month_page.png)
 
 > 사용자가 Week Tab에서 기록한 정보가 자동 연동된다.
 Kizitonwose CalendarView 라이브러리를 이용하여 달력 구현
@@ -104,7 +107,7 @@ WeekTab에서 사용자가 선택한 감정 이모지를 달력 형태로 시각
 </aside>
 
 ### ✅ Tab 4 : Profile Tab
-
+![profile_page](./images/profile_page.png)
 
 
 ⭐ **내 프로필 (왼쪽 위)**
