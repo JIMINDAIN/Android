@@ -34,7 +34,7 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
     Column{
         AppHeader()
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         val context = LocalContext.current
 
@@ -77,8 +77,12 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
                             }
                             record.imageUri != null -> {
                                 val bitmap = remember(record.imageUri) {
+                                    val options = BitmapFactory.Options().apply {
+                                        inSampleSize = 8
+                                    }
+
                                     val inputStream = context.contentResolver.openInputStream(record.imageUri)
-                                    val bmp = BitmapFactory.decodeStream(inputStream)
+                                    val bmp = BitmapFactory.decodeStream(inputStream, null, options)
                                     inputStream?.close()
                                     bmp
                                 }

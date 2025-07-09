@@ -93,7 +93,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                         modifier = Modifier
                             .width(180.dp) //
-                            .height(32.dp)
+                            .height(28.dp)
                             /*.border(
                                 1.dp,
                                 colorResource(id = R.color.y2k_border),
@@ -267,7 +267,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                 Text(
                     text = "기록이 없습니다.",
                     fontFamily = nanumFont1,
-                    modifier = Modifier.padding(40.dp),
+                    modifier = Modifier.padding(20.dp),
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.LightGray,
                     fontSize = 20.sp
@@ -294,7 +294,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 12.dp, horizontal = 16.dp),
+                                .padding(vertical = 8.dp, horizontal = 16.dp),
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                         ) {
@@ -302,7 +302,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                             Image(
                                 painter = painterResource(id = record.emojiResID ?: R.drawable.emoji_happy),
                                 contentDescription = null,
-                                modifier = Modifier.size(35.dp)
+                                modifier = Modifier.size(26.dp)
                             )
 
                             Spacer(modifier = Modifier.width(12.dp))
@@ -312,7 +312,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                                 text = record.summary,
                                 fontFamily = nanumFont1,
                                 style = MaterialTheme.typography.titleMedium,
-                                fontSize = 20.sp,
+                                fontSize = 16.sp,
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -329,12 +329,12 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                         shape = RoundedCornerShape(16.dp), // 더 둥근 모서리
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFFF5FFFA)
-                        ), // 요일별 배경색
+                        ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp), // 그림자 강조
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.CenterHorizontally)
-                            .heightIn(min = 120.dp)
+                            .heightIn(min = 80.dp)
                             //.border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
                     ){
                         Text(
@@ -342,8 +342,8 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                             fontFamily = nanumFont1,
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Black,
-                            fontSize = 20.sp,
-                            modifier = Modifier.padding(top = 15.dp, start = 25.dp, end = 25.dp)
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(top = 12.dp, start = 20.dp, end = 20.dp)
                         )
                     }
 

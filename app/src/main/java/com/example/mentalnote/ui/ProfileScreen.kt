@@ -1,5 +1,6 @@
 package com.example.mentalnote.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +21,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -39,6 +39,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.edit
 import com.example.mentalnote.R
 import com.example.mentalnote.USER_BED_TIME
 import com.example.mentalnote.USER_FRIENDS
@@ -46,11 +47,9 @@ import com.example.mentalnote.USER_USERNAME
 import com.example.mentalnote.USER_WORK_END_TIME
 import com.example.mentalnote.dataStore
 import com.example.mentalnote.ui.theme.CustomFontFamily
+import com.example.mentalnote.util.NotificationScheduler
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import androidx.datastore.preferences.core.edit
-import android.util.Log
-import com.example.mentalnote.util.NotificationScheduler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -134,9 +133,9 @@ fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> 
                     Text(
                         text = username,
                         fontFamily = CustomFontFamily,
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = colorResource(id = R.color.y2k_text)
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF333333)
                     )
                 }
             }
