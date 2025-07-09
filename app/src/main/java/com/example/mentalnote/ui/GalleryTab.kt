@@ -46,7 +46,7 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
         val photoRecords = remember(dayRecords) {
             dayRecords.filter { it.imageUri != null || it.imageBitmap != null }
                 .sortedByDescending { it.date }
-                //.reversed()
+            //.reversed()
         }
 
         if (photoRecords.isEmpty()) {
