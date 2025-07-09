@@ -1,14 +1,9 @@
 package com.example.mentalnote.ui
 
-import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -37,27 +30,23 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.edit
-import coil.compose.AsyncImagePainter
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
 import com.example.mentalnote.R
 import com.example.mentalnote.USER_BED_TIME
 import com.example.mentalnote.USER_WORK_END_TIME
 import com.example.mentalnote.dataStore
-import com.example.mentalnote.ui.theme.CustomFontFamily
 import com.example.mentalnote.util.NotificationScheduler
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -69,11 +58,9 @@ fun ProfileScreen() {
     val scope = rememberCoroutineScope()
     val firebaseAuth = FirebaseAuth.getInstance()
     val firestore = FirebaseFirestore.getInstance()
-    val storage = FirebaseStorage.getInstance()
 
     var nickname by remember { mutableStateOf("") }
-    var profileImageUrl by remember { mutableStateOf<String?>(null) }
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var email by remember { mutableStateOf("") }
 
     var workEndTime by remember { mutableStateOf("미설정") }
     var bedTime by remember { mutableStateOf("미설정") }
@@ -83,21 +70,17 @@ fun ProfileScreen() {
     val workTimePickerState = rememberTimePickerState()
     val bedTimePickerState = rememberTimePickerState()
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        selectedImageUri = uri
-    }
+    val dunggeunmoFontFamily = FontFamily(Font(R.font.dunggeunmo))
 
     LaunchedEffect(firebaseAuth.currentUser) {
         val user = firebaseAuth.currentUser
         if (user != null) {
+            email = user.email ?: "이메일 정보 없음"
             // Load user profile from Firestore
             firestore.collection("users").document(user.uid).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         nickname = document.getString("nickname") ?: user.displayName ?: ""
-                        profileImageUrl = document.getString("profileImageUrl")
                     } else {
                         nickname = user.displayName ?: ""
                     }
@@ -120,26 +103,15 @@ fun ProfileScreen() {
         val user = firebaseAuth.currentUser ?: return
         scope.launch {
             try {
-                var finalImageUrl = profileImageUrl
-                // 1. Upload image to Firebase Storage if a new one is selected
-                selectedImageUri?.let { uri ->
-                    val storageRef = storage.reference.child("profile_images/${user.uid}.jpg")
-                    val uploadTask = storageRef.putFile(uri).await()
-                    finalImageUrl = uploadTask.storage.downloadUrl.await().toString()
-                }
-
-                // 2. Save nickname and image URL to Firestore
+                // Save nickname to Firestore
                 val userProfile = hashMapOf(
-                    "nickname" to nickname,
-                    "profileImageUrl" to finalImageUrl
+                    "nickname" to nickname
                 )
 
                 firestore.collection("users").document(user.uid)
-                    .set(userProfile)
+                    .set(userProfile, com.google.firebase.firestore.SetOptions.merge())
                     .await()
 
-                // Update local state
-                profileImageUrl = finalImageUrl
                 Toast.makeText(context, "프로필이 저장되었습니다.", Toast.LENGTH_SHORT).show()
 
             } catch (e: Exception) {
@@ -176,67 +148,35 @@ fun ProfileScreen() {
                 ) {
                     Text(
                         text = "내 프로필",
-                        fontFamily = CustomFontFamily,
+                        fontFamily = dunggeunmoFontFamily,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         color = colorResource(id = R.color.y2k_text),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 24.dp)
                     )
-                    // Profile Image
-                    Box(
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                            .background(Color.LightGray)
-                            .clickable { imagePickerLauncher.launch("image/*") },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SubcomposeAsyncImage(
-                            model = selectedImageUri ?: profileImageUrl,
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        ) {
-                            when (painter.state) {
-                                is AsyncImagePainter.State.Error, null -> {
-                                    // Fallback Composable
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(
-                                                colorResource(id = R.color.y2k_primary)
-                                                    .copy(alpha = 0.7f)
-                                            ),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = nickname.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
-                                            fontFamily = CustomFontFamily,
-                                            fontSize = 48.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.White
-                                        )
-                                    }
-                                }
-                                is AsyncImagePainter.State.Loading -> {
-                                    // You can add a loading indicator here if you want
-                                    Box(modifier = Modifier.fillMaxSize().background(Color.LightGray))
-                                }
-                                else -> {
-                                    SubcomposeAsyncImageContent()
-                                }
-                            }
-                        }
-                    }
+
+                    // Email Display
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = {},
+                        label = { Text("이메일", fontFamily = dunggeunmoFontFamily) },
+                        readOnly = true,
+                        textStyle = TextStyle(
+                            fontFamily = dunggeunmoFontFamily,
+                            fontSize = 18.sp
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
+
                     // Nickname TextField
                     OutlinedTextField(
                         value = nickname,
                         onValueChange = { nickname = it },
-                        label = { Text("닉네임") },
+                        label = { Text("닉네임", fontFamily = dunggeunmoFontFamily) },
                         singleLine = true,
-                        textStyle = androidx.compose.ui.text.TextStyle(
-                            fontFamily = CustomFontFamily,
+                        textStyle = TextStyle(
+                            fontFamily = dunggeunmoFontFamily,
                             fontSize = 18.sp
                         ),
                         modifier = Modifier.fillMaxWidth()
@@ -247,7 +187,7 @@ fun ProfileScreen() {
                         onClick = { saveUserProfile() },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("프로필 저장")
+                        Text("프로필 저장", fontFamily = dunggeunmoFontFamily)
                     }
                 }
             }
@@ -270,7 +210,7 @@ fun ProfileScreen() {
                 ) {
                     Text(
                         text = "알림 설정",
-                        fontFamily = CustomFontFamily,
+                        fontFamily = dunggeunmoFontFamily,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         color = colorResource(id = R.color.y2k_text),
@@ -288,14 +228,14 @@ fun ProfileScreen() {
                     ) {
                         Text(
                             text = "퇴근 시간 알림",
-                            fontFamily = CustomFontFamily,
+                            fontFamily = dunggeunmoFontFamily,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
                             color = colorResource(id = R.color.y2k_text)
                         )
                         Text(
                             text = workEndTime,
-                            fontFamily = CustomFontFamily,
+                            fontFamily = dunggeunmoFontFamily,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = colorResource(id = R.color.y2k_primary)
@@ -305,7 +245,7 @@ fun ProfileScreen() {
                     if (showWorkEndTimePicker) {
                         AlertDialog(
                             onDismissRequest = { showWorkEndTimePicker = false },
-                            title = { Text("퇴근 시간 설정", fontFamily = CustomFontFamily) },
+                            title = { Text("퇴근 시간 설정", fontFamily = dunggeunmoFontFamily) },
                             text = { TimePicker(state = workTimePickerState) },
                             confirmButton = {
                                 Button(onClick = {
@@ -319,12 +259,12 @@ fun ProfileScreen() {
                                         NotificationScheduler.scheduleNotifications(context)
                                     }
                                 }) {
-                                    Text("확인", fontFamily = CustomFontFamily)
+                                    Text("확인", fontFamily = dunggeunmoFontFamily)
                                 }
                             },
                             dismissButton = {
                                 Button(onClick = { showWorkEndTimePicker = false }) {
-                                    Text("취소", fontFamily = CustomFontFamily)
+                                    Text("취소", fontFamily = dunggeunmoFontFamily)
                                 }
                             }
                         )
@@ -343,14 +283,14 @@ fun ProfileScreen() {
                     ) {
                         Text(
                             text = "취침 시간 알림",
-                            fontFamily = CustomFontFamily,
+                            fontFamily = dunggeunmoFontFamily,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
                             color = colorResource(id = R.color.y2k_text)
                         )
                         Text(
                             text = bedTime,
-                            fontFamily = CustomFontFamily,
+                            fontFamily = dunggeunmoFontFamily,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = colorResource(id = R.color.y2k_primary)
@@ -360,7 +300,7 @@ fun ProfileScreen() {
                     if (showBedTimePicker) {
                         AlertDialog(
                             onDismissRequest = { showBedTimePicker = false },
-                            title = { Text("취침 시간 설정", fontFamily = CustomFontFamily) },
+                            title = { Text("취침 시간 설정", fontFamily = dunggeunmoFontFamily) },
                             text = { TimePicker(state = bedTimePickerState) },
                             confirmButton = {
                                 Button(onClick = {
@@ -374,12 +314,12 @@ fun ProfileScreen() {
                                         NotificationScheduler.scheduleNotifications(context)
                                     }
                                 }) {
-                                    Text("확인", fontFamily = CustomFontFamily)
+                                    Text("확인", fontFamily = dunggeunmoFontFamily)
                                 }
                             },
                             dismissButton = {
                                 Button(onClick = { showBedTimePicker = false }) {
-                                    Text("취소", fontFamily = CustomFontFamily)
+                                    Text("취소", fontFamily = dunggeunmoFontFamily)
                                 }
                             }
                         )
