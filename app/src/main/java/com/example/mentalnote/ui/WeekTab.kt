@@ -389,14 +389,44 @@ fun DayDetailDialog(
         }
     }
 
-    val galleryLauncher = rememberLauncherForActivityResult(
+    /*val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
             imageUri = uri.toString()
             cameraBitmap = null
         }
+    }*/
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val fileName = "gallery_${System.currentTimeMillis()}.jpg"
+                val file = File(context.cacheDir, fileName)
+
+                val outputStream = file.outputStream()
+                inputStream?.copyTo(outputStream)
+                inputStream?.close()
+                outputStream.close()
+
+                val newUri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file
+                )
+
+                imageUri = newUri.toString()
+                cameraBitmap = null
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
+
 
     fun launchCamera() {
         if (hasCameraPermission) {

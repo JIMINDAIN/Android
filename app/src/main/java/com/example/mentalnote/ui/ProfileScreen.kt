@@ -265,7 +265,7 @@ fun ProfileScreen() {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -273,8 +273,8 @@ fun ProfileScreen() {
                         fontFamily = CustomFontFamily,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorResource(id = R.color.y2k_text),
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        color = Color(0xFF333333),
+                        modifier = Modifier.padding(bottom = 3.dp)
                     )
 
                     // Work End Time Setting
