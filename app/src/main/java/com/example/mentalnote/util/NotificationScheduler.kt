@@ -9,6 +9,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.os.Build
+import android.media.AudioAttributes
+import android.net.Uri
+import android.media.RingtoneManager
 import androidx.core.app.NotificationCompat
 import com.example.mentalnote.R
 import com.example.mentalnote.USER_BED_TIME
@@ -30,12 +33,20 @@ class NotificationScheduler {
 
         fun createNotificationChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val audioAttributes = AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build()
+
+                val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) // 기본 알람 소리 사용
+
                 val channel = NotificationChannel(
                     CHANNEL_ID,
                     CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     description = "Reminders for Mental Note app"
+                    setSound(soundUri, audioAttributes) // 알림 소리 설정
                 }
                 val notificationManager: NotificationManager =
                     context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

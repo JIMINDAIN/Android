@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.mentalnote.model.DayRecord
+import android.net.Uri
 
 
 @Composable
@@ -77,7 +78,7 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
                             }
                             record.imageUri != null -> {
                                 val bitmap = remember(record.imageUri) {
-                                    val inputStream = context.contentResolver.openInputStream(record.imageUri)
+                                    val inputStream = context.contentResolver.openInputStream(Uri.parse(record.imageUri))
                                     val bmp = BitmapFactory.decodeStream(inputStream)
                                     inputStream?.close()
                                     bmp
