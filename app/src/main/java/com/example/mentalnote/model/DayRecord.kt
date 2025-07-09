@@ -19,11 +19,11 @@ import kotlinx.serialization.Transient
 
 @Serializable
 data class DayRecord(
-    val date: String, //yyyy-mm-dd
+    val date: String = "", //yyyy-mm-dd
     val emojiResID: Int? = null,
     val summary: String = "",
     val detail: String = "",
-    @Contextual val imageUri: Uri? = null,
+    val imageUri: String? = null,
 
     @Transient
     val imageBitmap: ImageBitmap? = null

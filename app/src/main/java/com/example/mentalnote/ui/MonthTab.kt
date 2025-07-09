@@ -56,6 +56,8 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 
 
 val nanumFont1 = FontFamily(Font(R.font.dunggeunmo))
@@ -73,7 +75,14 @@ fun MonthTab(dayRecords : List<DayRecord>) {
     //var dayRecords by remember {mutableStateOf<List<DayRecord>>(emptyList()) }
     val dayRecordMap : Map<LocalDate, DayRecord> = dayRecords.associateBy {LocalDate.parse(it.date)}
 
-    Column{
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) {
+            if (selectedDate.value != null) {
+                selectedDate.value = null
+            }
+        }
+    ){
         AppHeader()
 
         CenterAlignedTopAppBar(
@@ -277,6 +286,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
+                        .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) { /* Consume clicks */ }
                 ){
                     Spacer(modifier = Modifier.height(8.dp))
 

@@ -67,45 +67,52 @@ import com.example.mentalnote.R
 import com.example.mentalnote.dataStore
 import com.example.mentalnote.model.DayRecord
 import com.example.mentalnote.ui.theme.CustomFontFamily
-import com.example.mentalnote.util.UriSerializer
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
 
-val DAY_RECORDS_KEY = stringPreferencesKey("day_records")
-val LAST_RESET_DATE_KEY = stringPreferencesKey("last_reset_date")
-
 val json = Json {
-    serializersModule = SerializersModule {
-        contextual(UriSerializer)
-    }
+    ignoreUnknownKeys = true
 }
 
 suspend fun saveDayRecords(context: Context, records: List<DayRecord>) {
-    val json = json.encodeToString(records)
-    context.dataStore.edit { prefs ->
-        prefs[DAY_RECORDS_KEY] = json
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    val db = Firebase.firestore
+
+    records.forEach { record ->
+        db.collection("users").document(userId)
+            .collection("dayRecords").document(record.date)
+            .set(record, SetOptions.merge())
+            .await()
     }
 }
 
 suspend fun loadDayRecords(context: Context): List<DayRecord> {
     Log.d("loadDayRecords", "불러오기 시작")
-    val prefs = context.dataStore.data.first()
-    val jsonString = prefs[DAY_RECORDS_KEY]
-    return if (jsonString == null) {
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+    if (userId == null) {
+        Log.d("loadDayRecords", "User not logged in.")
+        return emptyList()
+    }
+
+    val db = Firebase.firestore
+    return try {
+        val querySnapshot = db.collection("users").document(userId)
+            .collection("dayRecords").get().await()
+        querySnapshot.documents.mapNotNull { it.toObject(DayRecord::class.java) }
+    } catch (e: Exception) {
+        Log.e("loadDayRecords", "Error loading records", e)
         emptyList()
-    } else {
-        try {
-            json.decodeFromString(jsonString)
-        } catch (e: Exception) {
-            emptyList()
-        }
     }
 }
 
@@ -127,16 +134,13 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
     //매주 월요일마다 초기화
     //기존 데이터는 그대로 유지되고 WeekRecord 변수만 초기화
     LaunchedEffect(Unit) {
-        val prefs = context.dataStore.data.first()
-        val lastResetDateStr = prefs[LAST_RESET_DATE_KEY]
-        val lastResetDate = lastResetDateStr?.let { LocalDate.parse(it) }
-
         val existingRecords = loadDayRecords(context).toMutableList()
+        val today = LocalDate.now()
+        val monday = today.with(DayOfWeek.MONDAY)
+        val weekDateStrings = weekDates.map { it.toString() }
 
-        if (today.dayOfWeek == DayOfWeek.MONDAY && lastResetDate != monday) {
+        if (today.dayOfWeek == DayOfWeek.MONDAY) {
             // 이번 주 날짜만 새로운 빈 DayRecord로 교체
-            // 만약 오늘이 월요일이고, 저장된 마지막 초기화 날짜(lastResetDate)가 이번 주 월요일과 다르면
-            // (= 월요일인데 초기화가 안된 경우)
             weekDateStrings.forEach { dateStr ->
                 val idx = existingRecords.indexOfFirst { it.date == dateStr }
                 if (idx != -1) {
@@ -145,12 +149,8 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
                     existingRecords.add(DayRecord(date = dateStr))
                 }
             }
-
             weekRecords = existingRecords.filter { it.date in weekDateStrings }
             coroutineScope.launch {
-                context.dataStore.edit { prefs ->
-                    prefs[LAST_RESET_DATE_KEY] = monday.toString()
-                }
                 saveDayRecords(context, existingRecords)
             }
         } else {
@@ -212,7 +212,7 @@ fun WeekTab(dayRecords: List<DayRecord>, onSave: (DayRecord) -> Unit) {
                     emojiResID = emojiResID,
                     summary = summary,
                     detail = detail,
-                    imageUri = imageUri,
+                    imageUri = imageUri?.toString(),
                     imageBitmap = imageBitmap
                 )
                 weekRecords = weekRecords.toMutableList().also { list ->
@@ -355,7 +355,7 @@ fun DayDetailDialog(
     date: String,
     initialRecord: DayRecord?,
     onDismiss: () -> Unit,
-    onSave: (Int?, String, String, Uri?, androidx.compose.ui.graphics.ImageBitmap?) -> Unit
+    onSave: (Int?, String, String, String?, androidx.compose.ui.graphics.ImageBitmap?) -> Unit
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -369,7 +369,7 @@ fun DayDetailDialog(
     var summary by remember { mutableStateOf(initialRecord?.summary ?: "") }
     var detail by remember { mutableStateOf(initialRecord?.detail ?: "") }
     var selectedEmojiRes by remember { mutableStateOf(initialRecord?.emojiResID ?: null) }
-    var imageUri by remember { mutableStateOf<Uri?>(initialRecord?.imageUri) }
+    var imageUri by remember { mutableStateOf<String?>(initialRecord?.imageUri) }
     var cameraBitmap by remember { mutableStateOf(initialRecord?.imageBitmap) }
     val photoUri = remember { mutableStateOf<Uri?>(null) }
 
@@ -390,7 +390,7 @@ fun DayDetailDialog(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success && photoUri.value != null) {
-            imageUri = photoUri.value
+            imageUri = photoUri.value.toString()
             cameraBitmap = null
         }
     }
@@ -399,7 +399,7 @@ fun DayDetailDialog(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            imageUri = uri
+            imageUri = uri.toString()
             cameraBitmap = null
         }
     }
@@ -528,7 +528,7 @@ fun DayDetailDialog(
                     // 사진 미리보기
                     imageUri?.let {
                         Image(
-                            painter = rememberAsyncImagePainter(model = it),
+                            painter = rememberAsyncImagePainter(model = Uri.parse(it)),
                             contentDescription = "Selected image",
                             modifier = Modifier
                                 .fillMaxWidth()

@@ -85,5 +85,6 @@ dependencies {
     // Firebase BoM 및 Authentication 라이브러리 추가
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
     }
