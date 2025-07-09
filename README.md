@@ -38,7 +38,7 @@
 ---
 
 ### ✅ 스플래시 화면
-
+![MindNote](images/splash.png)
 
 ### ✅ 회원가입 / 로그인 화면
 
