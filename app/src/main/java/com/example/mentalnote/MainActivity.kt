@@ -188,6 +188,8 @@ fun MainScreen() {
             dayRecords = loadedRecords
         }*/
 
+
+
         withContext(Dispatchers.IO) {
             val dummyRecords = loadDummyJsonRecords(context)
             saveDayRecords(context, dummyRecords)
@@ -199,6 +201,18 @@ fun MainScreen() {
                 dayRecords = dummyRecords
             }
         }
+
+        /*val records = loadDayRecords(context).toMutableList()
+
+        if (records.isEmpty()) {
+            val dummy = loadDummyJsonRecordsOnce(context)
+            if (dummy.isNotEmpty()) {
+                records.addAll(dummy)
+                saveDayRecords(context, records)
+            }
+        }
+
+        dayRecords = records*/
     }
 
     LaunchedEffect(Unit) {

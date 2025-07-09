@@ -22,7 +22,7 @@ fun AppHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding( start = 18.dp, top = 18.dp),
+            .padding( start = 12.dp, top = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(modifier = Modifier.width(5.dp))
@@ -30,7 +30,7 @@ fun AppHeader() {
         Image(
             painter = painterResource(id = R.drawable.mindnote_logo_no_logo),
             contentDescription = "App Logo",
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier.size(25.dp)
         )
 
         Spacer(modifier = Modifier.width(15.dp))
@@ -38,7 +38,7 @@ fun AppHeader() {
         Text(
             text = "mindnote",
             fontFamily = nanumFont1,
-            fontSize = 25.sp,
+            fontSize = 20.sp,
             color = Color(0xFF6B4D47) // 갈색
         )
     }
