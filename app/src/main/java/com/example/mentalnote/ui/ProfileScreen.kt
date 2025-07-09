@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-//import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(onAddFriendClick: () -> Unit, onFriendRequestListClick: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var username by remember { mutableStateOf("") }
@@ -141,112 +141,112 @@ fun ProfileScreen() {
             }
             Spacer(modifier = Modifier.height(20.dp))
 
-//            // Friend Management Section
-//            Card(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 8.dp),
-//                shape = RoundedCornerShape(16.dp),
-//                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFDF0)), // Light Cyan
-//                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-//            ) {
-//                Column(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(24.dp),
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    Text(
-//                        text = "내 친구 목록",
-//                        fontFamily = CustomFontFamily,
-//                        fontSize = 22.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        color = colorResource(id = R.color.y2k_text),
-//                        modifier = Modifier.padding(bottom = 16.dp)
-//                    )
-//
-//                    if (friends.isEmpty()) {
-//                        Text(
-//                            text = "아직 친구가 없습니다.",
-//                            fontFamily = CustomFontFamily,
-//                            fontSize = 16.sp,
-//                            color = colorResource(id = R.color.y2k_text),
-//                            modifier = Modifier.padding(bottom = 16.dp)
-//                        )
-//                    } else {
-//                        Column(modifier = Modifier.fillMaxWidth()) {
-//                            friends.forEach { friend ->
-//                                Card(
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .padding(vertical = 4.dp),
-//                                    shape = RoundedCornerShape(8.dp),
-//                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFB0E0E6)), // Powder Blue
-//                                    //elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-//                                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-//                                ) {
-//                                    Text(
-//                                        text = friend,
-//                                        fontFamily = CustomFontFamily,
-//                                        fontSize = 20.sp,
-//                                        fontWeight = FontWeight.Medium,
-//                                        color = Color.Black,
-//                                        modifier = Modifier.padding(12.dp)
-//                                    )
-//                                }
-//                            }
-//                        }
-//                        Spacer(modifier = Modifier.height(16.dp))
-//                    }
-//
-//                    Button(
-//                        onClick = onAddFriendClick,
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(52.dp),
-//                            //.border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
-//                        shape = RoundedCornerShape(16.dp),
-//                        elevation = ButtonDefaults.buttonElevation(
-//                            defaultElevation = 3.dp,
-//                            pressedElevation = 2.dp,
-//                            focusedElevation = 3.dp
-//                        ),
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFF0F5)) // 배경색과 유사하게
-//                    ) {
-//                        Text(
-//                            "친구 추가",
-//                            fontFamily = CustomFontFamily,
-//                            fontSize = 18.sp,
-//                            fontWeight = FontWeight.Bold,
-//                            color = Color(0xFF333333)
-//                        )
-//                    }
-//                    Spacer(modifier = Modifier.height(16.dp))
-//                    Button(
-//                        onClick = onFriendRequestListClick,
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(52.dp),
-//                            //.border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
-//                        //shape = CutCornerShape(12.dp),
-//                        shape = RoundedCornerShape(16.dp),
-//                        elevation = ButtonDefaults.buttonElevation(
-//                            defaultElevation = 3.dp,
-//                            pressedElevation = 2.dp,
-//                            focusedElevation = 3.dp
-//                        ),
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBFE7F2)) // 배경색과 유사하게
-//                    ) {
-//                        Text(
-//                            "친구 요청 목록",
-//                            fontFamily = CustomFontFamily,
-//                            fontSize = 18.sp,
-//                            fontWeight = FontWeight.SemiBold,
-//                            color = Color(0xFF333333)
-//                        )
-//                    }
-//                }
-//            }
+            // Friend Management Section
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFDF0)), // Light Cyan
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "내 친구 목록",
+                        fontFamily = CustomFontFamily,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorResource(id = R.color.y2k_text),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    if (friends.isEmpty()) {
+                        Text(
+                            text = "아직 친구가 없습니다.",
+                            fontFamily = CustomFontFamily,
+                            fontSize = 16.sp,
+                            color = colorResource(id = R.color.y2k_text),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    } else {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            friends.forEach { friend ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFFB0E0E6)), // Powder Blue
+                                    //elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                                ) {
+                                    Text(
+                                        text = friend,
+                                        fontFamily = CustomFontFamily,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Color.Black,
+                                        modifier = Modifier.padding(12.dp)
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    Button(
+                        onClick = onAddFriendClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                            //.border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 3.dp,
+                            pressedElevation = 2.dp,
+                            focusedElevation = 3.dp
+                        ),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFF0F5)) // 배경색과 유사하게
+                    ) {
+                        Text(
+                            "친구 추가",
+                            fontFamily = CustomFontFamily,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF333333)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = onFriendRequestListClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                            //.border(2.dp, colorResource(id = R.color.y2k_border), CutCornerShape(12.dp)),
+                        //shape = CutCornerShape(12.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 3.dp,
+                            pressedElevation = 2.dp,
+                            focusedElevation = 3.dp
+                        ),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFBFE7F2)) // 배경색과 유사하게
+                    ) {
+                        Text(
+                            "친구 요청 목록",
+                            fontFamily = CustomFontFamily,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF333333)
+                        )
+                    }
+                }
+            }
 
             // Notification Settings Section
             Spacer(modifier = Modifier.height(20.dp))

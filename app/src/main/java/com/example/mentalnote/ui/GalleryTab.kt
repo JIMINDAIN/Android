@@ -1,6 +1,7 @@
 package com.example.mentalnote.ui
 
 import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.mentalnote.model.DayRecord
-import android.net.Uri
 
 
 @Composable
@@ -78,11 +78,12 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
                             }
                             record.imageUri != null -> {
                                 val bitmap = remember(record.imageUri) {
+                                    val uri = Uri.parse(record.imageUri.toString())
                                     val options = BitmapFactory.Options().apply {
-                                        inSampleSize = 8
+                                        inSampleSize = 4
                                     }
 
-                                    val inputStream = context.contentResolver.openInputStream(Uri.parse(record.imageUri))
+                                    val inputStream = context.contentResolver.openInputStream(uri)
                                     val bmp = BitmapFactory.decodeStream(inputStream, null, options)
                                     inputStream?.close()
                                     bmp
