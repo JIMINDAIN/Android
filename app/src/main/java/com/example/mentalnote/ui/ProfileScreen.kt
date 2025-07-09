@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -245,8 +246,18 @@ fun ProfileScreen() {
                     if (showWorkEndTimePicker) {
                         AlertDialog(
                             onDismissRequest = { showWorkEndTimePicker = false },
+                            containerColor = colorResource(id = R.color.y2k_background),
                             title = { Text("퇴근 시간 설정", fontFamily = dunggeunmoFontFamily) },
-                            text = { TimePicker(state = workTimePickerState) },
+                            text = {
+                                TimePicker(
+                                    state = workTimePickerState,
+                                    colors = TimePickerDefaults.colors(
+                                        clockDialColor = colorResource(id = R.color.y2k_secondary),
+                                        selectorColor = colorResource(id = R.color.y2k_primary),
+                                        containerColor = colorResource(id = R.color.y2k_background)
+                                    )
+                                )
+                            },
                             confirmButton = {
                                 Button(onClick = {
                                     showWorkEndTimePicker = false
@@ -300,8 +311,18 @@ fun ProfileScreen() {
                     if (showBedTimePicker) {
                         AlertDialog(
                             onDismissRequest = { showBedTimePicker = false },
+                            containerColor = colorResource(id = R.color.y2k_background),
                             title = { Text("취침 시간 설정", fontFamily = dunggeunmoFontFamily) },
-                            text = { TimePicker(state = bedTimePickerState) },
+                            text = {
+                                TimePicker(
+                                    state = bedTimePickerState,
+                                    colors = TimePickerDefaults.colors(
+                                        clockDialColor = colorResource(id = R.color.y2k_secondary),
+                                        selectorColor = colorResource(id = R.color.y2k_primary),
+                                        containerColor = colorResource(id = R.color.y2k_background)
+                                    )
+                                )
+                            },
                             confirmButton = {
                                 Button(onClick = {
                                     showBedTimePicker = false
