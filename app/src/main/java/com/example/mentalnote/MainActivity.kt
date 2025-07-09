@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.mentalnote.model.DayRecord
@@ -50,6 +51,7 @@ import com.example.mentalnote.util.NotificationScheduler
 import com.example.mentalnote.util.loadDummyJsonRecords
 import kotlinx.coroutines.flow.first
 
+
 enum class AuthScreen {
     LOGIN,
     REGISTER
@@ -63,10 +65,9 @@ enum class MainScreenState {
 }
 
 
-// ... (기존 코드)
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         NotificationScheduler.createNotificationChannel(applicationContext)
 
