@@ -1,7 +1,5 @@
 package com.example.mentalnote
 
-
-//import com.example.mentalnote.ui.FriendScreen
 import android.app.AlarmManager
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -39,8 +37,6 @@ import androidx.core.content.ContextCompat
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.mentalnote.model.DayRecord
-import com.example.mentalnote.ui.AddFriendScreen
-import com.example.mentalnote.ui.FriendRequestListScreen
 import com.example.mentalnote.ui.GalleryTab
 import com.example.mentalnote.ui.LoginScreen
 import com.example.mentalnote.ui.MonthTab
@@ -65,9 +61,7 @@ enum class MainScreenState {
     WEEK,
     GALLERY,
     MONTH,
-    PROFILE,
-    ADDFRIEND,
-    FRIEND_REQUESTS
+    PROFILE
 }
 
 
@@ -287,12 +281,7 @@ fun MainScreen() {
                     )
                     MainScreenState.GALLERY -> GalleryTab(dayRecords = dayRecords)
                     MainScreenState.MONTH -> MonthTab(dayRecords = dayRecords)
-                    MainScreenState.PROFILE -> ProfileScreen(
-                        onAddFriendClick = { currentMainScreenState = MainScreenState.ADDFRIEND },
-                        onFriendRequestListClick = { currentMainScreenState = MainScreenState.FRIEND_REQUESTS }
-                    )
-                    MainScreenState.ADDFRIEND -> AddFriendScreen(onBack = { currentMainScreenState = MainScreenState.PROFILE })
-                    MainScreenState.FRIEND_REQUESTS -> FriendRequestListScreen(onBack = { currentMainScreenState = MainScreenState.PROFILE })
+                    MainScreenState.PROFILE -> ProfileScreen()
                 }
             }
         }
