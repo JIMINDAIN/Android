@@ -1,5 +1,6 @@
 package com.example.mentalnote.ui
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -32,9 +33,19 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.mentalnote.model.DayRecord
 
-
 @Composable
 fun GalleryTab(dayRecords: List<DayRecord>) {
+    fun canLoadImage(uriString: String?, context: Context): Boolean {
+        return try {
+            uriString ?: return false
+            val uri = Uri.parse(uriString)
+            context.contentResolver.openInputStream(uri)?.close()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     Column{
         AppHeader()
 
@@ -43,10 +54,16 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
         val context = LocalContext.current
 
         // Tab1에서 저장된 기록 중 사진이 있는 항목만 필터링
-        val photoRecords = remember(dayRecords) {
+        /*val photoRecords = remember(dayRecords) {
             dayRecords.filter { it.imageUri != null || it.imageBitmap != null }
                 .sortedByDescending { it.date }
             //.reversed()
+        }*/
+
+        val photoRecords = remember(dayRecords) {
+            dayRecords.filter {
+                it.imageBitmap != null || (it.imageUri != null && canLoadImage(it.imageUri, context))
+            }.sortedByDescending { it.date }
         }
 
         if (photoRecords.isEmpty()) {
@@ -83,11 +100,15 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
                                 val bitmap = remember(record.imageUri) {
                                     try{
                                         val uri = Uri.parse(record.imageUri.toString())
+
+                                        val inputStream = context.contentResolver.openInputStream(uri)
+                                            ?: return@remember null
+
                                         val options = BitmapFactory.Options().apply {
                                             inSampleSize = 4
                                         }
 
-                                        val inputStream = context.contentResolver.openInputStream(uri)
+                                        //val inputStream = context.contentResolver.openInputStream(uri)
                                         val bmp = BitmapFactory.decodeStream(inputStream, null, options)
                                         inputStream?.close()
 

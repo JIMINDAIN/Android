@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Firebase BoM 및 Authentication 라이브러리 추가
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
