@@ -344,7 +344,7 @@ fun MonthTab(dayRecords : List<DayRecord>) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.CenterHorizontally)
-                            .heightIn(min = 80.dp)
+                            .heightIn(min = 85.dp)
                             //.border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(16.dp))
                     ){
                         Text(

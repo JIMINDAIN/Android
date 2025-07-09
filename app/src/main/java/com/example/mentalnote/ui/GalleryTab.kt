@@ -1,6 +1,9 @@
 package com.example.mentalnote.ui
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -86,7 +89,26 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
                                     val inputStream = context.contentResolver.openInputStream(uri)
                                     val bmp = BitmapFactory.decodeStream(inputStream, null, options)
                                     inputStream?.close()
-                                    bmp
+
+                                    val exifStream = context.contentResolver.openInputStream(uri)
+                                    val exif = ExifInterface(exifStream!!)
+                                    val orientation = exif.getAttributeInt(
+                                        ExifInterface.TAG_ORIENTATION,
+                                        ExifInterface.ORIENTATION_NORMAL
+                                    )
+
+                                    val matrix = Matrix()
+                                    when (orientation) {
+                                        ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+                                        ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+                                        ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+                                    }
+                                    exifStream.close()
+
+                                    bmp?.let { Bitmap.createBitmap(it, 0, 0, it.width, it.height, matrix, true) }
+
+
+                                    //bmp
                                 }
                                 bitmap?.let {
                                     Image(
