@@ -82,7 +82,7 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
                                         inSampleSize = 8
                                     }
 
-                                    val inputStream = context.contentResolver.openInputStream(record.imageUri)
+                                    val inputStream = context.contentResolver.openInputStream(Uri.parse(record.imageUri))
                                     val bmp = BitmapFactory.decodeStream(inputStream, null, options)
                                     inputStream?.close()
                                     bmp

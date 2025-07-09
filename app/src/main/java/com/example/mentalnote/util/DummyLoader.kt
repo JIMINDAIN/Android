@@ -46,7 +46,7 @@ suspend fun loadDummyJsonRecordsOnce(context: Context): List<DayRecord> {
             emojiResID = emojiResID,
             summary = dummy.summary,
             detail = dummy.detail,
-            imageUri = imageUri
+            imageUri = imageUri.toString()
         )
     }
 
