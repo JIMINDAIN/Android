@@ -48,9 +48,7 @@ import com.example.mentalnote.ui.saveDayRecords
 import com.example.mentalnote.ui.theme.MentalNoteTheme
 import com.example.mentalnote.util.NotificationScheduler
 import com.example.mentalnote.util.loadDummyJsonRecords
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
 
 enum class AuthScreen {
     LOGIN,
@@ -184,7 +182,7 @@ fun MainScreen() {
 
 
 
-        withContext(Dispatchers.IO) {
+        /*withContext(Dispatchers.IO) {
             val dummyRecords = loadDummyJsonRecords(context)
             saveDayRecords(context, dummyRecords)
             context.dataStore.edit {
@@ -194,19 +192,19 @@ fun MainScreen() {
             withContext(Dispatchers.Main) {
                 dayRecords = dummyRecords
             }
-        }
+        }*/
 
-        /*val records = loadDayRecords(context).toMutableList()
-
-        if (records.isEmpty()) {
-            val dummy = loadDummyJsonRecordsOnce(context)
-            if (dummy.isNotEmpty()) {
-                records.addAll(dummy)
-                saveDayRecords(context, records)
+        if (!alreadyInitialized) {
+            val dummyRecords = loadDummyJsonRecords(context)
+            saveDayRecords(context, dummyRecords)
+            context.dataStore.edit {
+                it[stringPreferencesKey("init_dummy")] = "true"
             }
+            Log.d("DUMMY", "더미 데이터 최초 저장 완료")
         }
 
-        dayRecords = records*/
+        val latestRecords = loadDayRecords(context)
+        dayRecords = latestRecords
     }
 
     LaunchedEffect(Unit) {
