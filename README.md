@@ -113,6 +113,8 @@ WeekTab에서 사용자가 선택한 감정 이모지를 달력 형태로 시각
 
 </aside>
 
+
+
 ### ✅ Tab 4 : Profile Tab
 ![profile_page](./images/profile_page.png)
 
@@ -125,6 +127,7 @@ WeekTab에서 사용자가 선택한 감정 이모지를 달력 형태로 시각
 - 닉네임을 설정해 Firebase에 같이 저장
 </aside>
 
+
 ⭐ **알림 설정 (왼쪽 아래 + 오른쪽 그림)**
 
 <aside>
@@ -132,13 +135,13 @@ WeekTab에서 사용자가 선택한 감정 이모지를 달력 형태로 시각
 - 퇴근 시간과 취침 시간을 설정해 사용자 맞춤형 알림 설정
 </aside>
 
+
 ⭐ **푸쉬 알림**
 
 <aside>
 
 - 설정해놓은 퇴근 시간, 취침 시간에 푸쉬 알림
 - ![Notification](images/notification.png)
-</aside>
 
 
 
