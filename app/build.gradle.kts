@@ -44,6 +44,7 @@ android {
 }
 
 dependencies {
+
     implementation(libs.kotlinx.serialization.json)  // 여기서도 alias로 관리
     implementation(libs.androidx.core.ktx)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
@@ -81,11 +82,12 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Firebase BoM 및 Authentication 라이브러리 추가
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
-
+    //implementation("androidx.exifinterface:exifinterface:1.3.7")
     }

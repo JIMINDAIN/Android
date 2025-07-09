@@ -1,5 +1,6 @@
 package com.example.mentalnote.ui
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -26,15 +27,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.example.mentalnote.model.DayRecord
-
 
 @Composable
 fun GalleryTab(dayRecords: List<DayRecord>) {
+    fun canLoadImage(uriString: String?, context: Context): Boolean {
+        return try {
+            uriString ?: return false
+            val uri = Uri.parse(uriString)
+            context.contentResolver.openInputStream(uri)?.close()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     Column{
         AppHeader()
 
@@ -43,10 +54,16 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
         val context = LocalContext.current
 
         // Tab1에서 저장된 기록 중 사진이 있는 항목만 필터링
-        val photoRecords = remember(dayRecords) {
+        /*val photoRecords = remember(dayRecords) {
             dayRecords.filter { it.imageUri != null || it.imageBitmap != null }
                 .sortedByDescending { it.date }
-                //.reversed()
+            //.reversed()
+        }*/
+
+        val photoRecords = remember(dayRecords) {
+            dayRecords.filter {
+                it.imageBitmap != null || (it.imageUri != null && canLoadImage(it.imageUri, context))
+            }.sortedByDescending { it.date }
         }
 
         if (photoRecords.isEmpty()) {
@@ -81,38 +98,48 @@ fun GalleryTab(dayRecords: List<DayRecord>) {
                             }
                             record.imageUri != null -> {
                                 val bitmap = remember(record.imageUri) {
-                                    val uri = Uri.parse(record.imageUri.toString())
-                                    val options = BitmapFactory.Options().apply {
-                                        inSampleSize = 4
+                                    try{
+                                        val uri = Uri.parse(record.imageUri.toString())
+
+                                        val inputStream = context.contentResolver.openInputStream(uri)
+                                            ?: return@remember null
+
+                                        val options = BitmapFactory.Options().apply {
+                                            inSampleSize = 4
+                                        }
+
+                                        //val inputStream = context.contentResolver.openInputStream(uri)
+                                        val bmp = BitmapFactory.decodeStream(inputStream, null, options)
+                                        inputStream?.close()
+
+                                        val exifStream = context.contentResolver.openInputStream(uri)
+                                        val exif = ExifInterface(exifStream!!)
+                                        val orientation = exif.getAttributeInt(
+                                            ExifInterface.TAG_ORIENTATION,
+                                            ExifInterface.ORIENTATION_NORMAL
+                                        )
+
+                                        val matrix = Matrix()
+                                        when (orientation) {
+                                            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+                                            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+                                            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+                                        }
+                                        exifStream.close()
+
+                                        bmp?.let { Bitmap.createBitmap(it, 0, 0, it.width, it.height, matrix, true) }
+
+                                    } catch(e: Exception){
+                                        e.printStackTrace()
+                                        null
                                     }
-
-                                    val inputStream = context.contentResolver.openInputStream(uri)
-                                    val bmp = BitmapFactory.decodeStream(inputStream, null, options)
-                                    inputStream?.close()
-
-                                    val exifStream = context.contentResolver.openInputStream(uri)
-                                    val exif = ExifInterface(exifStream!!)
-                                    val orientation = exif.getAttributeInt(
-                                        ExifInterface.TAG_ORIENTATION,
-                                        ExifInterface.ORIENTATION_NORMAL
-                                    )
-
-                                    val matrix = Matrix()
-                                    when (orientation) {
-                                        ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
-                                        ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
-                                        ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
-                                    }
-                                    exifStream.close()
-
-                                    bmp?.let { Bitmap.createBitmap(it, 0, 0, it.width, it.height, matrix, true) }
-
 
                                     //bmp
                                 }
                                 bitmap?.let {
                                     Image(
-                                        bitmap = it.asImageBitmap(),
+                                        //bitmap = it.asImageBitmap(),
+                                        painter = rememberAsyncImagePainter(model = Uri.parse(record.imageUri)),
                                         contentDescription = null,
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop

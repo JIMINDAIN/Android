@@ -60,23 +60,17 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import coil.compose.rememberAsyncImagePainter
 import com.example.mentalnote.R
-import com.example.mentalnote.dataStore
 import com.example.mentalnote.model.DayRecord
 import com.example.mentalnote.ui.theme.CustomFontFamily
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -395,14 +389,44 @@ fun DayDetailDialog(
         }
     }
 
-    val galleryLauncher = rememberLauncherForActivityResult(
+    /*val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
             imageUri = uri.toString()
             cameraBitmap = null
         }
+    }*/
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val fileName = "gallery_${System.currentTimeMillis()}.jpg"
+                val file = File(context.cacheDir, fileName)
+
+                val outputStream = file.outputStream()
+                inputStream?.copyTo(outputStream)
+                inputStream?.close()
+                outputStream.close()
+
+                val newUri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file
+                )
+
+                imageUri = newUri.toString()
+                cameraBitmap = null
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
+
 
     fun launchCamera() {
         if (hasCameraPermission) {
