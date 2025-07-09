@@ -528,6 +528,7 @@ fun DayDetailDialog(
                                 .fillMaxWidth()
                                 .height(200.dp)
                                 .clip(RoundedCornerShape(12.dp))
+                                //.background(Color.White)
                                 .border(1.dp, colorResource(id = R.color.y2k_border), RoundedCornerShape(12.dp))
                         )
                         Spacer(modifier = Modifier.height(16.dp))
