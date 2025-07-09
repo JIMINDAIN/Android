@@ -1,10 +1,4 @@
 [{
-  "date": "2025-06-16",
-  "emojiResName": "emoji_happy",
-  "summary": "카이스트에서 보낸 하루",
-  "detail": "카이스트에서 보낸 하루",
-  "imageFileName": "img_20.png"
-},{
   "date": "2025-06-17",
   "emojiResName": "emoji_happy",
   "summary": "나의 생일 파티",
@@ -91,14 +85,14 @@
     "emojiResName": "emoji_blue",
     "summary": "강릉 여행",
     "detail": "강릉 중앙 시장에서 가서 맛있는 음식을 먹었다!",
-    "imageFileName": "img_8.png"
+    "imageFileName": "img_20.png"
   },
   {
     "date": "2025-06-30",
     "emojiResName": "emoji_bored",
-    "summary": "강릉 여행",
-    "detail": "강릉 중앙 시장에서 가서 맛있는 음식을 먹었다!",
-    "imageFileName": "img_6.jpg"
+    "summary": "도서관에 하루종일",
+    "detail": "도서관에만 계속 있어서 너무 지루했다..",
+    "imageFileName": "img_8.png"
   },
   {
     "date": "2025-07-01",
