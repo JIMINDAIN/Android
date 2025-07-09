@@ -137,8 +137,9 @@ WeekTab에서 사용자가 선택한 감정 이모지를 달력 형태로 시각
 <aside>
 
 - 설정해놓은 퇴근 시간, 취침 시간에 푸쉬 알림
+- ![Notification](images/notification.png)
 </aside>
-![push](images/notification.png)
+
 
 
   **다운로드 링크**
