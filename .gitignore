@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Added by Gemini
+.env
+*.log
+firepit-log.txt
+/.idea/
